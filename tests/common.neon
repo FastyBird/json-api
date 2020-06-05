@@ -1,0 +1,33 @@
+#
+# Node lib DI configuration
+#
+# @license		More in license.md
+# @copyright	https://www.fastybird.com
+# @author		Adam Kadlec <adam.kadlec@fastybird.com>
+# @package		FastyBird:NodeJsonApi!
+# @subpackage	config
+# @since		0.1.0
+#
+# @date			25.05.20
+
+#########################
+# Used Nette extensions #
+#########################
+
+extensions:
+	contributteTranslation		: Contributte\Translation\DI\TranslationExtension
+	nodeWebServer				: FastyBird\NodeWebServer\DI\NodeWebServerExtension
+
+##################################
+# Nette extensions configuration #
+##################################
+
+# Node translations
+###################
+contributteTranslation:
+	locales:
+		default: en_US
+		fallback: [en_US, en]
+	localeResolvers: []
+	dirs:
+		- %appDir%/src/Translations
