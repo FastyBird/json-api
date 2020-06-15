@@ -220,6 +220,8 @@ abstract class Hydrator
 	): array {
 		$data = [];
 
+		$isNew = $entity === null;
+
 		foreach ($entityMapping as $field) {
 			if ($field instanceof Hydrators\Fields\EntityField && $field->isRelationship()) {
 				continue;
@@ -234,7 +236,7 @@ abstract class Hydrator
 			$value = $this->callHydrateAttribute($field->getFieldName(), $attributes, $entity);
 			$value = $value ?? $field->getValue($attributes);
 
-			if ($value === null && $field->isRequired() && $entity === null) {
+			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
 					StatusCodeInterface::STATUS_BAD_REQUEST,
 					$this->translator->translate('//node.base.messages.missingRequired.heading'),
@@ -244,7 +246,7 @@ abstract class Hydrator
 					]
 				);
 
-			} elseif ($field->isWritable() || ($entity === null && $field->isRequired())) {
+			} elseif ($field->isWritable() || ($isNew && $field->isRequired())) {
 				if ($field instanceof Hydrators\Fields\SingleEntityField) {
 					// Get attribute entity class name
 					$fieldClassName = $field->getClassName();
@@ -308,6 +310,28 @@ abstract class Hydrator
 
 		} catch (Throwable $ex) {
 			// Nothing to do here
+		}
+
+		if (!$isNew) {
+			foreach ($data as $attribute => $value) {
+				$isAllowed = false;
+
+				foreach ($entityMapping as $field) {
+					if ($field instanceof Hydrators\Fields\EntityField && $field->isRelationship()) {
+						$isAllowed = true;
+
+						continue;
+					}
+
+					if ($field->getFieldName() === $attribute) {
+						$isAllowed = true;
+					}
+				}
+
+				if (!$isAllowed) {
+					unset($data[$attribute]);
+				}
+			}
 		}
 
 		return $data;
