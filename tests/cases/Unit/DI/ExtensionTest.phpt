@@ -20,6 +20,7 @@ final class ExtensionTest extends BaseTestCase
 			'origin'   => 'com.fastybird.node',
 			'rabbitmq' => [
 				'queueName' => 'testingQueueName',
+				'routing'   => [],
 			],
 		]);
 
