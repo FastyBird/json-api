@@ -1,15 +1,14 @@
 {
   "name" : "fastybird/node-json-api",
   "type" : "library",
-  "description" : "FastyBird microservice node api utils with {JSON:API} data hydration",
+  "description" : "FastyBird {JSON:API} api utils with data hydration for nodes",
   "keywords" : [
     "fastybird",
     "fb",
     "libs",
+    "library",
     "api",
-    "jsonapi",
-    "rabbit",
-    "library"
+    "jsonapi"
   ],
 
   "homepage" : "https://www.fastybird.com",
