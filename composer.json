@@ -33,19 +33,19 @@
   "minimum-stability" : "dev",
 
   "require" : {
-    "php" : ">=7.2.0",
+    "php" : ">=7.3.0",
     "ext-json" : "*",
-    "consistence/consistence": "~1.0|~2.0",
+    "consistence/consistence" : "~1.0|~2.0",
     "contributte/translation" : "^0.6",
-    "fastybird/node-libs" : "^0.5 || ^0.6",
-    "fastybird/node-web-server" : "^0.4 || ^0.5",
+    "fastybird/node-web-server" : "^0.6",
     "ipub/doctrine-crud" : "^2.3",
     "ipub/json-api-document" : "^0.1",
     "nette/bootstrap" : "^3.0",
     "nette/di" : "^3.0",
     "nette/utils" : "^3.0",
     "phpdocumentor/reflection-docblock" : "^5.1",
-    "ramsey/uuid" : "^3.9"
+    "psr/log" : "^1.1",
+    "ramsey/uuid" : "^3.5 || ^4.0"
   },
 
   "require-dev" : {

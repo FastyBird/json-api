@@ -104,7 +104,7 @@ class NodeJsonApiExtension extends DI\CompilerExtension implements Translation\D
 	public function getTranslationResources(): array
 	{
 		return [
-			__DIR__ . DS . '..' . DS . 'Translations',
+			__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Translations',
 		];
 	}
 
@@ -118,7 +118,10 @@ class NodeJsonApiExtension extends DI\CompilerExtension implements Translation\D
 		Nette\Configurator $config,
 		string $extensionName = 'nodeJsonApi'
 	): void {
-		$config->onCompile[] = function (Nette\Configurator $config, DI\Compiler $compiler) use ($extensionName): void {
+		$config->onCompile[] = function (
+			Nette\Configurator $config,
+			DI\Compiler $compiler
+		) use ($extensionName): void {
 			$compiler->addExtension($extensionName, new NodeJsonApiExtension());
 		};
 	}

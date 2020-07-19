@@ -15,9 +15,9 @@
 
 namespace FastyBird\NodeJsonApi\Exceptions;
 
-use FastyBird\NodeLibs\Exceptions as NodeLibsExceptions;
+use RuntimeException;
 
-class InvalidStateException extends NodeLibsExceptions\InvalidStateException implements IException
+class InvalidStateException extends RuntimeException implements IException
 {
 
 }

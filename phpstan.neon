@@ -1,5 +1,4 @@
 parameters:
-	bootstrap: phpstan-bootstrap.php
 	level: max
 	stubFiles:
 		- tests/PHPStan/stubs/Neomerx/JsonApi/Contracts/Factories/FactoryInterface.php

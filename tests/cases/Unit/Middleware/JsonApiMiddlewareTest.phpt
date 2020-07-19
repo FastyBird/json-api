@@ -18,6 +18,9 @@ use Tester\Assert;
 
 require_once __DIR__ . '/../../../bootstrap.php';
 
+/**
+ * @testCase
+ */
 final class JsonApiMiddlewareTest extends BaseMockeryTestCase
 {
 
@@ -71,10 +74,10 @@ final class JsonApiMiddlewareTest extends BaseMockeryTestCase
 
 		$middleware = new Middleware\JsonApiMiddleware(
 			$responseFactory,
-			$logger,
 			$container,
 			'Author name',
-			'Copyright'
+			'Copyright',
+			$logger
 		);
 
 		$uri = Mockery::mock(UriInterface::class);

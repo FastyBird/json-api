@@ -20,7 +20,6 @@ use FastRoute\RouteCollector as FastRouteCollector;
 use FastRoute\RouteParser\Std;
 use FastyBird\NodeJsonApi\Exceptions;
 use FastyBird\NodeJsonApi\JsonApi;
-use FastyBird\NodeLibs\Exceptions as NodeLibsExceptions;
 use FastyBird\NodeWebServer\Http as NodeWebServerHttp;
 use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
@@ -37,7 +36,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log;
 use Throwable;
 
 class JsonApiMiddleware implements MiddlewareInterface
@@ -59,7 +58,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 	/** @var NodeWebServerHttp\ResponseFactory */
 	private $responseFactory;
 
-	/** @var LoggerInterface */
+	/** @var Log\LoggerInterface */
 	private $logger;
 
 	/** @var DI\Container */
@@ -70,20 +69,20 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 	/**
 	 * @param NodeWebServerHttp\ResponseFactory $responseFactory
-	 * @param LoggerInterface $logger
 	 * @param DI\Container $container
 	 * @param string|string[] $metaAuthor
 	 * @param string $metaCopyright
+	 * @param Log\LoggerInterface|null $logger
 	 */
 	public function __construct(
 		NodeWebServerHttp\ResponseFactory $responseFactory,
-		LoggerInterface $logger,
 		DI\Container $container,
 		$metaAuthor,
-		string $metaCopyright
+		string $metaCopyright,
+		?Log\LoggerInterface $logger = null
 	) {
 		$this->responseFactory = $responseFactory;
-		$this->logger = $logger;
+		$this->logger = $logger ?? new Log\NullLogger();
 		$this->container = $container;
 
 		$this->metaAuthor = $metaAuthor;
@@ -215,10 +214,6 @@ class JsonApiMiddleware implements MiddlewareInterface
 				}
 			}
 
-		} catch (NodeLibsExceptions\TerminateException $ex) {
-			// Terminate exception is skipped, server will be shut down
-			throw $ex;
-
 		} catch (Throwable $ex) {
 			$response = $this->responseFactory->createResponse();
 
@@ -252,7 +247,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 				$response->getBody()->write($content);
 
 			} else {
-				$this->logger->error('[JSON:API_MIDDLEWARE] An error occurred during request handling', [
+				$this->logger->error('[FB::JSON_API] An error occurred during request handling', [
 					'exception' => [
 						'message' => $ex->getMessage(),
 						'code'    => $ex->getCode(),

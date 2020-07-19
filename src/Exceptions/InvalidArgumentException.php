@@ -15,9 +15,9 @@
 
 namespace FastyBird\NodeJsonApi\Exceptions;
 
-use FastyBird\NodeLibs\Exceptions as NodeLibsExceptions;
+use InvalidArgumentException as PHPInvalidArgumentException;
 
-class InvalidArgumentException extends NodeLibsExceptions\InvalidArgumentException implements IException
+class InvalidArgumentException extends PHPInvalidArgumentException implements IException
 {
 
 }
