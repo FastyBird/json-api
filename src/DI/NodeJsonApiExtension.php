@@ -4,7 +4,7 @@
  * NodeJsonApiExtension.php
  *
  * @license        More in license.md
- * @copyright      https://www.fastybird.com
+ * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  * @package        FastyBird:NodeJsonApi!
  * @subpackage     DI
@@ -25,7 +25,7 @@ use Nette\Schema;
 use stdClass;
 
 /**
- * Microservice node helpers extension container
+ * {JSON:API} api extension container
  *
  * @package        FastyBird:NodeJsonApi!
  * @subpackage     DI
@@ -104,7 +104,7 @@ class NodeJsonApiExtension extends DI\CompilerExtension implements Translation\D
 	public function getTranslationResources(): array
 	{
 		return [
-			__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Translations',
+			__DIR__ . '/../Translations',
 		];
 	}
 

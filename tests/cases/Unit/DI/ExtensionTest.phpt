@@ -3,6 +3,7 @@
 namespace Tests\Cases;
 
 use FastyBird\NodeJsonApi\DI;
+use FastyBird\NodeJsonApi\JsonApi;
 use FastyBird\NodeJsonApi\Middleware;
 use Nette;
 use Ninjify\Nunjuck\TestCase\BaseTestCase;
@@ -21,6 +22,8 @@ final class ExtensionTest extends BaseTestCase
 		$container = $this->createContainer();
 
 		Assert::notNull($container->getByType(Middleware\JsonApiMiddleware::class));
+
+		Assert::notNull($container->getByType(JsonApi\JsonApiSchemaContainer::class));
 	}
 
 	/**

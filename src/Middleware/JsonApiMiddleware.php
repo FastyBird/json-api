@@ -4,7 +4,7 @@
  * JsonApiMiddleware.php
  *
  * @license        More in license.md
- * @copyright      https://www.fastybird.com
+ * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  * @package        FastyBird:NodeJsonApi!
  * @subpackage     Controllers
@@ -39,6 +39,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log;
 use Throwable;
 
+/**
+ * {JSON:API} formatting output handling middleware
+ *
+ * @package        FastyBird:NodeJsonApi!
+ * @subpackage     Middleware
+ *
+ * @author         Adam Kadlec <adam.kadlec@fastybird.com>
+ */
 class JsonApiMiddleware implements MiddlewareInterface
 {
 

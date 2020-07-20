@@ -10,7 +10,7 @@
 
 ## What is FastyBird node {JSON:API} library?
 
-This is a [Nette framework](https://nette.org) extension with [{JSON:API}](https://jsonapi.org/) hydrator and schema factory for [FastyBird](https://www.fastybird.com) IoT microservices
+This is a [Nette framework](https://nette.org) extension with [{JSON:API}](https://jsonapi.org/) hydrator and schema factory for [FastyBird](https://fastybird.com) IoT microservices
 
 ## Installation
 
@@ -25,4 +25,4 @@ $ composer require fastybird/node-json-api
 Learn how to use database services & data hydrators in [documentation](https://github.com/FastyBird/node-json-api/blob/master/docs/en/index.md).
 
 ***
-Homepage [http://www.fastybird.com](http://www.fastybird.com) and repository [https://github.com/FastyBird/node-json-api](https://github.com/FastyBird/node-json-api).
+Homepage [http://fastybird.com](http://fastybird.com) and repository [https://github.com/FastyBird/node-json-api](https://github.com/FastyBird/node-json-api).

@@ -11,7 +11,7 @@
     "jsonapi"
   ],
 
-  "homepage" : "https://www.fastybird.com",
+  "homepage" : "https://fastybird.com",
 
   "license" : "Apache-2.0",
 
@@ -19,7 +19,7 @@
     {
       "name" : "FastyBird s.r.o.",
       "email" : "info@fastybird.com",
-      "homepage" : "https://www.fastybird.com/"
+      "homepage" : "https://fastybird.com/"
     },
     {
       "name" : "Adam Kadlec",
@@ -34,9 +34,9 @@
   "require" : {
     "php" : ">=7.3.0",
     "ext-json" : "*",
-    "consistence/consistence" : "~1.0|~2.0",
+    "consistence/consistence" : "~1.0 || ~2.0",
     "contributte/translation" : "^0.6",
-    "fastybird/node-web-server" : "^0.6",
+    "fastybird/node-web-server" : "^0.1",
     "ipub/doctrine-crud" : "^2.3",
     "ipub/json-api-document" : "^0.1",
     "nette/bootstrap" : "^3.0",
