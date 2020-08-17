@@ -734,6 +734,21 @@ abstract class Hydrator
 				$varAnnotation = $this->parseAnnotation($rp, 'var');
 
 				if ($varAnnotation === null) {
+					try {
+						$rm = $rc->getMethod('get' . ucfirst($fieldName));
+
+						$returnType = $rm->getReturnType();
+
+						if ($returnType instanceof ReflectionNamedType) {
+							$varAnnotation = $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
+						}
+
+					} catch (ReflectionException $ex) {
+						// Nothing to do
+					}
+				}
+
+				if ($varAnnotation === null) {
 					continue;
 				}
 
@@ -749,19 +764,6 @@ abstract class Hydrator
 				$isNullable = false;
 
 				$typesFound = 0;
-
-				try {
-					$rm = $rc->getMethod('get' . ucfirst($fieldName));
-
-					$returnType = $rm->getReturnType();
-
-					if ($returnType instanceof ReflectionNamedType) {
-						$varAnnotation = $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
-					}
-
-				} catch (ReflectionException $ex) {
-					// Nothing to do
-				}
 
 				if (strpos($varAnnotation, '|') !== false) {
 					$varDatatypes = explode('|', $varAnnotation);
