@@ -733,19 +733,17 @@ abstract class Hydrator
 			} else {
 				$varAnnotation = $this->parseAnnotation($rp, 'var');
 
-				if ($varAnnotation === null) {
-					try {
-						$rm = $rc->getMethod('get' . ucfirst($fieldName));
+				try {
+					$rm = $rc->getMethod('get' . ucfirst($fieldName));
 
-						$returnType = $rm->getReturnType();
+					$returnType = $rm->getReturnType();
 
-						if ($returnType instanceof ReflectionNamedType) {
-							$varAnnotation = $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
-						}
-
-					} catch (ReflectionException $ex) {
-						// Nothing to do
+					if ($returnType instanceof ReflectionNamedType) {
+						$varAnnotation = ($varAnnotation === null ? '' : $varAnnotation . '|') . $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
 					}
+
+				} catch (ReflectionException $ex) {
+					// Nothing to do
 				}
 
 				if ($varAnnotation === null) {
@@ -767,6 +765,7 @@ abstract class Hydrator
 
 				if (strpos($varAnnotation, '|') !== false) {
 					$varDatatypes = explode('|', $varAnnotation);
+					$varDatatypes = array_unique($varDatatypes);
 
 				} else {
 					$varDatatypes = [$varAnnotation];
@@ -777,7 +776,6 @@ abstract class Hydrator
 				foreach ($varDatatypes as $varDatatype) {
 					if (class_exists($varDatatype) || interface_exists($varDatatype)) {
 						$className = $varDatatype;
-
 						$isClass = true;
 
 						$typesFound++;
