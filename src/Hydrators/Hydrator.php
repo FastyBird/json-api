@@ -74,9 +74,9 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var mixed[]|null
+	 * @var mixed[]
 	 */
-	protected $attributes = null;
+	protected $attributes = [];
 
 	/**
 	 * The resource composited attribute keys to hydrate
@@ -93,9 +93,9 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var mixed[]|null
+	 * @var mixed[]
 	 */
-	protected $compositedAttributes = null;
+	protected $compositedAttributes = [];
 
 	/**
 	 * Resource relationship keys that should be automatically hydrated
@@ -586,7 +586,7 @@ abstract class Hydrator
 
 		$this->normalizedAttributes = [];
 
-		if ($this->attributes !== null) {
+		if ($this->attributes !== []) {
 			foreach ($this->attributes as $resourceKey => $entityKey) {
 				if (is_numeric($resourceKey)) {
 					$resourceKey = $entityKey;
@@ -620,7 +620,7 @@ abstract class Hydrator
 
 		$this->normalizedCompositedAttributes = [];
 
-		if ($this->compositedAttributes !== null) {
+		if ($this->compositedAttributes !== []) {
 			foreach ($this->compositedAttributes as $resourceKey => $entityKey) {
 				if (is_numeric($resourceKey)) {
 					$resourceKey = $entityKey;
