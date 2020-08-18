@@ -79,6 +79,25 @@ abstract class Hydrator
 	protected $attributes = null;
 
 	/**
+	 * The resource composited attribute keys to hydrate
+	 *
+	 * For example:
+	 *
+	 * ```
+	 * $attributes = [
+	 *  'params',
+	 *  'bar' => 'baz'
+	 * ];
+	 * ```
+	 *
+	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
+	 * resource `bar` attribute to the model `baz` attribute.
+	 *
+	 * @var mixed[]|null
+	 */
+	protected $compositedAttributes = null;
+
+	/**
 	 * Resource relationship keys that should be automatically hydrated
 	 *
 	 * @var string[]
@@ -87,6 +106,9 @@ abstract class Hydrator
 
 	/** @var mixed[]|null */
 	private $normalizedAttributes;
+
+	/** @var mixed[]|null */
+	private $normalizedCompositedAttributes;
 
 	/** @var mixed[]|null */
 	private $normalizedRelationships;
@@ -228,7 +250,10 @@ abstract class Hydrator
 			}
 
 			// Continue only if attribute is present
-			if (!$attributes->has($field->getMappedName())) {
+			if (
+				!$attributes->has($field->getMappedName())
+				&& !in_array($field->getFieldName(), $this->compositedAttributes, true)
+			) {
 				continue;
 			}
 
@@ -573,6 +598,40 @@ abstract class Hydrator
 	}
 
 	/**
+	 * @param string $entityKey
+	 *
+	 * @return string|null
+	 */
+	private function getCompositedAttributeKey(string $entityKey): ?string
+	{
+		$this->normalizeCompositeAttributes();
+
+		return $this->normalizedCompositedAttributes[$entityKey] ?? null;
+	}
+
+	/**
+	 * @return void
+	 */
+	private function normalizeCompositeAttributes(): void
+	{
+		if (is_array($this->normalizedCompositedAttributes)) {
+			return;
+		}
+
+		$this->normalizedCompositedAttributes = [];
+
+		if ($this->compositedAttributes !== null) {
+			foreach ($this->compositedAttributes as $resourceKey => $entityKey) {
+				if (is_numeric($resourceKey)) {
+					$resourceKey = $entityKey;
+				}
+
+				$this->normalizedCompositedAttributes[$entityKey] = $resourceKey;
+			}
+		}
+	}
+
+	/**
 	 * Get the model method name for a resource relationship key
 	 *
 	 * @param string $entityKey
@@ -680,6 +739,9 @@ abstract class Hydrator
 
 			} elseif ($this->getAttributeKey($fieldName) !== null) {
 				$mappedKey = $this->getAttributeKey($fieldName);
+
+			} elseif ($this->getCompositedAttributeKey($fieldName) !== null) {
+				$mappedKey = $this->getCompositedAttributeKey($fieldName);
 
 			} else {
 				continue;
