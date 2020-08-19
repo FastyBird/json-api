@@ -206,8 +206,8 @@ abstract class Hydrator
 				if (!Uuid\Uuid::isValid($identifier)) {
 					throw new Exceptions\JsonApiErrorException(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-						$this->translator->translate('//node.base.messages.identifierInvalid.heading'),
-						$this->translator->translate('//node.base.messages.identifierInvalid.message'),
+						$this->translator->translate('//nodeJsonApi.hydrator.identifierInvalid.heading'),
+						$this->translator->translate('//nodeJsonApi.hydrator.identifierInvalid.message'),
 						[
 							'pointer' => 'data/id',
 						]
@@ -264,8 +264,8 @@ abstract class Hydrator
 			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
 					StatusCodeInterface::STATUS_BAD_REQUEST,
-					$this->translator->translate('//node.base.messages.missingRequired.heading'),
-					$this->translator->translate('//node.base.messages.missingRequired.message'),
+					$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredAttribute.heading'),
+					$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredAttribute.message'),
 					[
 						'pointer' => 'data/attributes/' . $field->getMappedName(),
 					]
@@ -436,8 +436,8 @@ abstract class Hydrator
 						} elseif ($entity === null && $field->isRequired()) {
 							$this->errors->addError(
 								StatusCodeInterface::STATUS_NOT_FOUND,
-								$this->translator->translate('//node.base.messages.missingRequired.heading'),
-								$this->translator->translate('//node.base.messages.missingRequired.message'),
+								$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
+								$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
 								[
 									'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
 								]
@@ -447,8 +447,8 @@ abstract class Hydrator
 					} elseif ($entity === null && $field->isRequired()) {
 						$this->errors->addError(
 							StatusCodeInterface::STATUS_BAD_REQUEST,
-							$this->translator->translate('//node.base.messages.missingRequired.heading'),
-							$this->translator->translate('//node.base.messages.missingRequired.message'),
+							$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
+							$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
 							[
 								'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
 							]
