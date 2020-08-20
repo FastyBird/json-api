@@ -395,9 +395,7 @@ abstract class Hydrator
 					if ($relationship->isHasOne()) {
 						$relationshipEntity = $this->hydrateHasOne($key, $relationship, $entity, $entityMapping);
 
-						if ($relationshipEntity !== null) {
-							$data[$field->getFieldName()] = $relationshipEntity;
-						}
+						$data[$field->getFieldName()] = $relationshipEntity;
 					}
 
 				}
@@ -427,7 +425,7 @@ abstract class Hydrator
 			// Find relationship field
 			if ($field->getMappedName() === $resourceKey && $field instanceof Hydrators\Fields\EntityField && $field->isRelationship()) {
 				if ($field->isWritable() || ($entity === null && $field->isRequired())) {
-					if ($relationship->getIdentifier() !== null) {
+					if ($relationship->getData() !== null && $relationship->getIdentifier() !== null) {
 						$relationEntity = $this->findRelated($field->getClassName(), $relationship->getIdentifier());
 
 						if ($relationEntity !== null) {
