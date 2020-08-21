@@ -378,12 +378,18 @@ abstract class Hydrator
 	): array {
 		$data = [];
 
-		/** @var JsonAPIDocument\Objects\IRelationship<mixed> $relationship */
-		foreach ($relationships->getAll() as $key => $relationship) {
-			foreach ($entityMapping as $field) {
-				if ($field->getMappedName() === $key) {
+		foreach ($entityMapping as $field) {
+			if ($field instanceof Hydrators\Fields\EntityField && $field->isRelationship()) {
+				if ($relationships->has($field->getMappedName())) {
+					$relationship = $relationships->getRelationship($field->getMappedName());
+
 					// If there is a specific method for this relationship, we'll hydrate that
-					$result = $this->callHydrateRelationship($key, $relationship, $included, $entity);
+					$result = $this->callHydrateRelationship(
+						$field->getMappedName(),
+						$relationship,
+						$included,
+						$entity
+					);
 
 					if ($result !== null) {
 						$data[$field->getFieldName()] = $result;
@@ -393,11 +399,25 @@ abstract class Hydrator
 
 					// If this is a has-one, we'll hydrate it
 					if ($relationship->isHasOne()) {
-						$relationshipEntity = $this->hydrateHasOne($key, $relationship, $entity, $entityMapping);
+						$relationshipEntity = $this->hydrateHasOne(
+							$field->getMappedName(),
+							$relationship,
+							$entity,
+							$entityMapping
+						);
 
 						$data[$field->getFieldName()] = $relationshipEntity;
 					}
 
+				} elseif ($field->isRequired() && $entity === null) {
+					$this->errors->addError(
+						StatusCodeInterface::STATUS_BAD_REQUEST,
+						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
+						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+						[
+							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
+						]
+					);
 				}
 			}
 		}
