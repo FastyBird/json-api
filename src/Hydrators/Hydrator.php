@@ -514,12 +514,14 @@ abstract class Hydrator
 			&& $field->isRelationship()
 		) {
 			if ($field->isWritable() || ($entity === null && $field->isRequired())) {
-				foreach ($relationship->getData() as $relation) {
-					if ($relation instanceof JsonAPIDocument\Objects\IResourceIdentifier) {
-						$relationEntity = $this->findRelated($field->getClassName(), $relation);
+				if ($relationship->getData() instanceof JsonAPIDocument\Objects\IResourceIdentifierCollection) {
+					foreach ($relationship->getData() as $relation) {
+						if ($relation instanceof JsonAPIDocument\Objects\IResourceIdentifier) {
+							$relationEntity = $this->findRelated($field->getClassName(), $relation);
 
-						if ($relationEntity !== null) {
-							$relations[] = $relationEntity;
+							if ($relationEntity !== null) {
+								$relations[] = $relationEntity;
+							}
 						}
 					}
 				}
