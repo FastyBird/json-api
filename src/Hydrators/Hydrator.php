@@ -400,13 +400,23 @@ abstract class Hydrator
 					// If this is a has-one, we'll hydrate it
 					if ($relationship->isHasOne()) {
 						$relationshipEntity = $this->hydrateHasOne(
-							$field->getMappedName(),
+							$field,
 							$relationship,
 							$entity,
 							$entityMapping
 						);
 
 						$data[$field->getFieldName()] = $relationshipEntity;
+
+					} elseif ($relationship->isHasMany()) {
+						$relationshipEntities = $this->hydrateHasMany(
+							$field,
+							$relationship,
+							$entity,
+							$entityMapping
+						);
+
+						$data[$field->getFieldName()] = $relationshipEntities;
 					}
 
 				} elseif ($field->isRequired() && $entity === null) {
@@ -428,7 +438,7 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-one relationship
 	 *
-	 * @param string $resourceKey
+	 * @param Hydrators\Fields\IField $field
 	 * @param JsonAPIDocument\Objects\IRelationship<mixed> $relationship
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 * @param Hydrators\Fields\IField[] $entityMapping
@@ -436,35 +446,26 @@ abstract class Hydrator
 	 * @return DoctrineCrud\Entities\IEntity|null
 	 */
 	protected function hydrateHasOne(
-		string $resourceKey,
+		Hydrators\Fields\IField $field,
 		JsonAPIDocument\Objects\IRelationship $relationship,
 		?DoctrineCrud\Entities\IEntity $entity,
 		array $entityMapping
 	): ?DoctrineCrud\Entities\IEntity {
-		foreach ($entityMapping as $field) {
-			// Find relationship field
-			if ($field->getMappedName() === $resourceKey && $field instanceof Hydrators\Fields\EntityField && $field->isRelationship()) {
-				if ($field->isWritable() || ($entity === null && $field->isRequired())) {
-					if ($relationship->getData() !== null && $relationship->getIdentifier() !== null) {
-						$relationEntity = $this->findRelated($field->getClassName(), $relationship->getIdentifier());
+		// Find relationship field
+		if (
+			$field instanceof Hydrators\Fields\EntityField
+			&& $field->isRelationship()
+		) {
+			if ($field->isWritable() || ($entity === null && $field->isRequired())) {
+				if ($relationship->getData() !== null && $relationship->getIdentifier() !== null) {
+					$relationEntity = $this->findRelated($field->getClassName(), $relationship->getIdentifier());
 
-						if ($relationEntity !== null) {
-							return $relationEntity;
-
-						} elseif ($entity === null && $field->isRequired()) {
-							$this->errors->addError(
-								StatusCodeInterface::STATUS_NOT_FOUND,
-								$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
-								$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
-								[
-									'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
-								]
-							);
-						}
+					if ($relationEntity !== null) {
+						return $relationEntity;
 
 					} elseif ($entity === null && $field->isRequired()) {
 						$this->errors->addError(
-							StatusCodeInterface::STATUS_BAD_REQUEST,
+							StatusCodeInterface::STATUS_NOT_FOUND,
 							$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
 							$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
 							[
@@ -472,11 +473,73 @@ abstract class Hydrator
 							]
 						);
 					}
+
+				} elseif ($entity === null && $field->isRequired()) {
+					$this->errors->addError(
+						StatusCodeInterface::STATUS_BAD_REQUEST,
+						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
+						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+						[
+							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
+						]
+					);
 				}
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Hydrate a resource has-many relationship
+	 *
+	 * @param Hydrators\Fields\IField $field
+	 * @param JsonAPIDocument\Objects\IRelationship<mixed> $relationship
+	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param Hydrators\Fields\IField[] $entityMapping
+	 *
+	 * @return DoctrineCrud\Entities\IEntity[]
+	 */
+	protected function hydrateHasMany(
+		Hydrators\Fields\IField $field,
+		JsonAPIDocument\Objects\IRelationship $relationship,
+		?DoctrineCrud\Entities\IEntity $entity,
+		array $entityMapping
+	): array {
+		$relations = [];
+
+		// Find relationship field
+		if (
+			$field instanceof Hydrators\Fields\EntityField
+			&& $field->isRelationship()
+		) {
+			if ($field->isWritable() || ($entity === null && $field->isRequired())) {
+				foreach ($relationship->getData() as $relation) {
+					if ($relation instanceof JsonAPIDocument\Objects\IResourceIdentifier) {
+						$relationEntity = $this->findRelated($field->getClassName(), $relation);
+
+						if ($relationEntity !== null) {
+							$relations[] = $relationEntity;
+						}
+					}
+				}
+
+				if ($entity === null && $field->isRequired() && count($relations) === 0) {
+					$this->errors->addError(
+						StatusCodeInterface::STATUS_BAD_REQUEST,
+						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
+						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+						[
+							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data',
+						]
+					);
+				}
+			}
+
+			return $relations;
+		}
+
+		return [];
 	}
 
 	/**
