@@ -25,4 +25,4 @@ $ composer require fastybird/json-api
 Learn how to use {JSON:API} services & data hydrators in [documentation](https://github.com/FastyBird/json-api/blob/master/docs/en/index.md).
 
 ***
-Homepage [http://fastybird.com](http://fastybird.com) and repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).
+Homepage [https://www.fastybird.com](https://www.fastybird.com) and repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).
