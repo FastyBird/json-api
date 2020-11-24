@@ -6,22 +6,22 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     JsonApi
  * @since          0.1.0
  *
  * @date           13.03.20
  */
 
-namespace FastyBird\NodeJsonApi\JsonApi;
+namespace FastyBird\JsonApi\JsonApi;
 
-use FastyBird\NodeJsonApi\Schemas;
+use FastyBird\JsonApi\Schemas;
 use Neomerx\JsonApi;
 
 /**
  * Json:API schemas container
  *
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     JsonApi
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>

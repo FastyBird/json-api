@@ -1,7 +1,7 @@
 {
-  "name" : "fastybird/node-json-api",
+  "name" : "fastybird/json-api",
   "type" : "library",
-  "description" : "FastyBird {JSON:API} api utils with data hydration for nodes",
+  "description" : "FastyBird {JSON:API} api utils with data hydration",
   "keywords" : [
     "fastybird",
     "fb",
@@ -35,8 +35,8 @@
     "php" : ">=7.3.0",
     "ext-json" : "*",
     "consistence/consistence" : "~1.0 || ~2.0",
-    "contributte/translation" : "^0.6",
-    "fastybird/node-web-server" : "@dev",
+    "contributte/translation" : "^0.8",
+    "fastybird/web-server" : "@dev",
     "ipub/doctrine-crud" : "^2.3",
     "ipub/json-api-document" : "^0.1",
     "nette/bootstrap" : "^3.0",
@@ -63,7 +63,7 @@
 
   "autoload" : {
     "psr-4" : {
-      "FastyBird\\NodeJsonApi\\" : "src/"
+      "FastyBird\\JsonApi\\" : "src/"
     }
   },
 

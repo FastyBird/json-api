@@ -2,9 +2,9 @@
 
 namespace Tests\Cases;
 
-use FastyBird\NodeJsonApi\DI;
-use FastyBird\NodeJsonApi\JsonApi;
-use FastyBird\NodeJsonApi\Middleware;
+use FastyBird\JsonApi\DI;
+use FastyBird\JsonApi\JsonApi;
+use FastyBird\JsonApi\Middleware;
 use Nette;
 use Ninjify\Nunjuck\TestCase\BaseTestCase;
 use Tester\Assert;
@@ -41,7 +41,7 @@ final class ExtensionTest extends BaseTestCase
 
 		$config->addConfig(__DIR__ . '/../../../common.neon');
 
-		DI\NodeJsonApiExtension::register($config);
+		DI\JsonApiExtension::register($config);
 
 		return $config->createContainer();
 	}

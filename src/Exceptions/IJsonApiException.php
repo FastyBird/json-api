@@ -6,14 +6,14 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Exceptions
  * @since          0.1.0
  *
  * @date           06.03.18
  */
 
-namespace FastyBird\NodeJsonApi\Exceptions;
+namespace FastyBird\JsonApi\Exceptions;
 
 use Throwable;
 

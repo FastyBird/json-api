@@ -2,9 +2,9 @@
 
 namespace Tests\Cases;
 
-use FastyBird\NodeJsonApi\JsonApi;
-use FastyBird\NodeJsonApi\Middleware;
-use FastyBird\NodeWebServer\Http as NodeWebServerHttp;
+use FastyBird\JsonApi\JsonApi;
+use FastyBird\JsonApi\Middleware;
+use FastyBird\WebServer\Http as WebServerHttp;
 use Mockery;
 use Neomerx;
 use Nette\DI;
@@ -26,7 +26,7 @@ final class JsonApiMiddlewareTest extends BaseMockeryTestCase
 
 	public function testProcess(): void
 	{
-		$responseFactory = new NodeWebServerHttp\ResponseFactory();
+		$responseFactory = new WebServerHttp\ResponseFactory();
 
 		$logger = Mockery::mock(Log\LoggerInterface::class);
 
@@ -107,16 +107,16 @@ final class JsonApiMiddlewareTest extends BaseMockeryTestCase
 		$responseBody
 			->shouldReceive('write');
 
-		$response = Mockery::mock(NodeWebServerHttp\Response::class);
+		$response = Mockery::mock(WebServerHttp\Response::class);
 		$response
 			->shouldReceive('getEntity')
-			->andReturn(NodeWebServerHttp\ScalarEntity::from([
+			->andReturn(WebServerHttp\ScalarEntity::from([
 				'value' => 'content',
 			]))
 			->times(1)
 			->getMock()
 			->shouldReceive('hasAttribute')
-			->withArgs([NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT])
+			->withArgs([WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT])
 			->andReturn(false)
 			->getMock()
 			->shouldReceive('getBody')
@@ -135,7 +135,7 @@ final class JsonApiMiddlewareTest extends BaseMockeryTestCase
 
 		$response = $middleware->process($request, $handler);
 
-		Assert::type(NodeWebServerHttp\Response::class, $response);
+		Assert::type(WebServerHttp\Response::class, $response);
 	}
 
 }

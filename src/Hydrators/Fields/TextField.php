@@ -6,21 +6,21 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  * @since          0.1.0
  *
  * @date           26.05.20
  */
 
-namespace FastyBird\NodeJsonApi\Hydrators\Fields;
+namespace FastyBird\JsonApi\Hydrators\Fields;
 
 use IPub\JsonAPIDocument;
 
 /**
  * Entity text field
  *
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>

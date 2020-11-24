@@ -6,21 +6,21 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Controllers
  * @since          0.1.0
  *
  * @date           17.04.19
  */
 
-namespace FastyBird\NodeJsonApi\Middleware;
+namespace FastyBird\JsonApi\Middleware;
 
 use FastRoute;
 use FastRoute\RouteCollector as FastRouteCollector;
 use FastRoute\RouteParser\Std;
-use FastyBird\NodeJsonApi\Exceptions;
-use FastyBird\NodeJsonApi\JsonApi;
-use FastyBird\NodeWebServer\Http as NodeWebServerHttp;
+use FastyBird\JsonApi\Exceptions;
+use FastyBird\JsonApi\JsonApi;
+use FastyBird\WebServer\Http as WebServerHttp;
 use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
 use IPub\SlimRouter;
@@ -42,7 +42,7 @@ use Throwable;
 /**
  * {JSON:API} formatting output handling middleware
  *
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Middleware
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
@@ -63,7 +63,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 	/** @var string */
 	private $metaCopyright;
 
-	/** @var NodeWebServerHttp\ResponseFactory */
+	/** @var WebServerHttp\ResponseFactory */
 	private $responseFactory;
 
 	/** @var Log\LoggerInterface */
@@ -76,14 +76,14 @@ class JsonApiMiddleware implements MiddlewareInterface
 	private $routerDispatcher;
 
 	/**
-	 * @param NodeWebServerHttp\ResponseFactory $responseFactory
+	 * @param WebServerHttp\ResponseFactory $responseFactory
 	 * @param DI\Container $container
 	 * @param string|string[] $metaAuthor
 	 * @param string $metaCopyright
 	 * @param Log\LoggerInterface|null $logger
 	 */
 	public function __construct(
-		NodeWebServerHttp\ResponseFactory $responseFactory,
+		WebServerHttp\ResponseFactory $responseFactory,
 		DI\Container $container,
 		$metaAuthor,
 		string $metaCopyright,
@@ -108,10 +108,10 @@ class JsonApiMiddleware implements MiddlewareInterface
 		try {
 			$response = $handler->handle($request);
 
-			if ($response instanceof NodeWebServerHttp\Response) {
+			if ($response instanceof WebServerHttp\Response) {
 				$entity = $response->getEntity();
 
-				if ($entity instanceof NodeWebServerHttp\ScalarEntity) {
+				if ($entity instanceof WebServerHttp\ScalarEntity) {
 					$encoder = $this->getEncoder();
 
 					$links = [
@@ -120,9 +120,9 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 					$meta = $this->getBaseMeta();
 
-					if ($response->hasAttribute(NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT)) {
+					if ($response->hasAttribute(WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT)) {
 						$meta = array_merge($meta, [
-							'totalCount' => $response->getAttribute(NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT),
+							'totalCount' => $response->getAttribute(WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT),
 						]);
 
 						if (array_key_exists('page', $request->getQueryParams())) {
@@ -137,10 +137,10 @@ class JsonApiMiddleware implements MiddlewareInterface
 						}
 
 						if ($pageOffset !== null && $pageLimit !== null) {
-							$lastPage = (int) round($response->getAttribute(NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT) / $pageLimit) * $pageLimit;
+							$lastPage = (int) round($response->getAttribute(WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT) / $pageLimit) * $pageLimit;
 
-							if ($lastPage === $response->getAttribute(NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT)) {
-								$lastPage = $response->getAttribute(NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT) - $pageLimit;
+							if ($lastPage === $response->getAttribute(WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT)) {
+								$lastPage = $response->getAttribute(WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT) - $pageLimit;
 							}
 
 							$uri = $request->getUri();
@@ -162,7 +162,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 								]);
 							}
 
-							if ((($response->getAttribute(NodeWebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT) - $pageLimit) - ($pageOffset + $pageLimit)) >= 0) {
+							if ((($response->getAttribute(WebServerHttp\ResponseAttributes::ATTR_TOTAL_COUNT) - $pageLimit) - ($pageOffset + $pageLimit)) >= 0) {
 								$links = array_merge($links, [
 									self::LINK_NEXT => new Schema\Link(false, $this->uriToString($uriNext), false),
 								]);

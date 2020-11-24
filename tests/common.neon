@@ -1,10 +1,10 @@
 #
-# Node lib DI configuration
+# Lib DI configuration
 #
 # @license		More in license.md
 # @copyright	https://fastybird.com
 # @author		Adam Kadlec <adam.kadlec@fastybird.com>
-# @package		FastyBird:NodeJsonApi!
+# @package		FastyBird:JsonApi!
 # @subpackage	config
 # @since		0.1.0
 #
@@ -15,7 +15,7 @@ php:
 
 extensions:
 	contributteTranslation	: Contributte\Translation\DI\TranslationExtension
-	nodeWebServer			: FastyBird\NodeWebServer\DI\NodeWebServerExtension
+	fbWebServer				: FastyBird\WebServer\DI\WebServerExtension
 
 contributteTranslation:
 	locales:

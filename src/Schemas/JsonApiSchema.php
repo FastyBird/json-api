@@ -6,16 +6,16 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Schemas
  * @since          0.1.0
  *
  * @date           01.06.19
  */
 
-namespace FastyBird\NodeJsonApi\Schemas;
+namespace FastyBird\JsonApi\Schemas;
 
-use FastyBird\NodeJsonApi\Exceptions;
+use FastyBird\JsonApi\Exceptions;
 use IPub\DoctrineCrud;
 use Neomerx\JsonApi;
 use Nette;
@@ -23,7 +23,7 @@ use Nette;
 /**
  * Entity schema constructor
  *
- * @package            FastyBird:NodeJsonApi!
+ * @package            FastyBird:JsonApi!
  * @subpackage         Schemas
  *
  * @author             Adam Kadlec <adam.kadlec@fastybird.com>

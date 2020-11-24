@@ -1,24 +1,24 @@
 <?php declare(strict_types = 1);
 
 /**
- * NodeJsonApiExtension.php
+ * JsonApiExtension.php
  *
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     DI
  * @since          0.1.0
  *
  * @date           27.05.20
  */
 
-namespace FastyBird\NodeJsonApi\DI;
+namespace FastyBird\JsonApi\DI;
 
 use Contributte\Translation;
-use FastyBird\NodeJsonApi\JsonApi;
-use FastyBird\NodeJsonApi\Middleware;
-use FastyBird\NodeJsonApi\Schemas;
+use FastyBird\JsonApi\JsonApi;
+use FastyBird\JsonApi\Middleware;
+use FastyBird\JsonApi\Schemas;
 use Nette;
 use Nette\DI;
 use Nette\Schema;
@@ -27,12 +27,12 @@ use stdClass;
 /**
  * {JSON:API} api extension container
  *
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     DI
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-class NodeJsonApiExtension extends DI\CompilerExtension implements Translation\DI\TranslationProviderInterface
+class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\TranslationProviderInterface
 {
 
 	/**
@@ -116,13 +116,13 @@ class NodeJsonApiExtension extends DI\CompilerExtension implements Translation\D
 	 */
 	public static function register(
 		Nette\Configurator $config,
-		string $extensionName = 'nodeJsonApi'
+		string $extensionName = 'fbJsonApi'
 	): void {
 		$config->onCompile[] = function (
 			Nette\Configurator $config,
 			DI\Compiler $compiler
 		) use ($extensionName): void {
-			$compiler->addExtension($extensionName, new NodeJsonApiExtension());
+			$compiler->addExtension($extensionName, new JsonApiExtension());
 		};
 	}
 

@@ -6,14 +6,14 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  * @since          0.1.0
  *
  * @date           26.05.20
  */
 
-namespace FastyBird\NodeJsonApi\Hydrators;
+namespace FastyBird\JsonApi\Hydrators;
 
 use ArrayAccess;
 use Consistence;
@@ -22,8 +22,8 @@ use DateTimeInterface;
 use Doctrine\Common;
 use Doctrine\ORM;
 use Doctrine\Persistence;
-use FastyBird\NodeJsonApi\Exceptions;
-use FastyBird\NodeJsonApi\Hydrators;
+use FastyBird\JsonApi\Exceptions;
+use FastyBird\JsonApi\Hydrators;
 use Fig\Http\Message\StatusCodeInterface;
 use IPub\DoctrineCrud;
 use IPub\JsonAPIDocument;
@@ -40,7 +40,7 @@ use Throwable;
 /**
  * Entity hydrator
  *
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
@@ -206,8 +206,8 @@ abstract class Hydrator
 				if (!Uuid\Uuid::isValid($identifier)) {
 					throw new Exceptions\JsonApiErrorException(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-						$this->translator->translate('//nodeJsonApi.hydrator.identifierInvalid.heading'),
-						$this->translator->translate('//nodeJsonApi.hydrator.identifierInvalid.message'),
+						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.heading'),
+						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.message'),
 						[
 							'pointer' => 'data/id',
 						]
@@ -264,8 +264,8 @@ abstract class Hydrator
 			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
 					StatusCodeInterface::STATUS_BAD_REQUEST,
-					$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredAttribute.heading'),
-					$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredAttribute.message'),
+					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.heading'),
+					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.message'),
 					[
 						'pointer' => 'data/attributes/' . $field->getMappedName(),
 					]
@@ -422,8 +422,8 @@ abstract class Hydrator
 				} elseif ($field->isRequired() && $entity === null) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_BAD_REQUEST,
-						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
-						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
+						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
 							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
 						]
@@ -466,8 +466,8 @@ abstract class Hydrator
 					} elseif ($entity === null && $field->isRequired()) {
 						$this->errors->addError(
 							StatusCodeInterface::STATUS_NOT_FOUND,
-							$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
-							$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
+							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 							[
 								'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
 							]
@@ -477,8 +477,8 @@ abstract class Hydrator
 				} elseif ($entity === null && $field->isRequired()) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_BAD_REQUEST,
-						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
-						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
+						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
 							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
 						]
@@ -529,8 +529,8 @@ abstract class Hydrator
 				if ($entity === null && $field->isRequired() && count($relations) === 0) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_BAD_REQUEST,
-						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.heading'),
-						$this->translator->translate('//nodeJsonApi.hydrator.missingRequiredRelation.message'),
+						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
+						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
 							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data',
 						]

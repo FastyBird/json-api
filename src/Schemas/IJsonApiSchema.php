@@ -6,14 +6,14 @@
  * @license        More in license.md
  * @copyright      https://fastybird.com
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- * @package        FastyBird:NodeJsonApi!
+ * @package        FastyBird:JsonApi!
  * @subpackage     Schemas
  * @since          0.1.0
  *
  * @date           13.03.20
  */
 
-namespace FastyBird\NodeJsonApi\Schemas;
+namespace FastyBird\JsonApi\Schemas;
 
 use Neomerx\JsonApi\Contracts;
 
