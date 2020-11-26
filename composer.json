@@ -32,7 +32,7 @@
   "minimum-stability" : "dev",
 
   "require" : {
-    "php" : ">=7.3.0",
+    "php" : ">=7.4.0",
     "ext-json" : "*",
     "consistence/consistence" : "~1.0 || ~2.0",
     "contributte/translation" : "^0.8",
