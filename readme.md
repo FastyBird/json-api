@@ -1,6 +1,6 @@
 # FastyBird {JSON:API} library
 
-[![Build Status](https://img.shields.io/travis/FastyBird/json-api.svg?style=flat-square)](https://travis-ci.org/FastyBird/json-api)
+[![Build Status](https://img.shields.io/travis/FastyBird/json-api.svg?style=flat-square)](https://travis-ci.com/FastyBird/json-api)
 [![Code coverage](https://img.shields.io/coveralls/FastyBird/json-api.svg?style=flat-square)](https://coveralls.io/r/FastyBird/json-api)
 ![PHP from Travis config](https://img.shields.io/travis/php-v/fastybird/json-api?style=flat-square)
 [![Licence](https://img.shields.io/packagist/l/FastyBird/json-api.svg?style=flat-square)](https://packagist.org/packages/FastyBird/json-api)
@@ -10,7 +10,7 @@
 
 ## What is FastyBird {JSON:API} library?
 
-This is a [Nette framework](https://nette.org) extension with [{JSON:API}](https://jsonapi.org/) hydrator and schema factory
+This is a [Nette framework](https://nette.org) extension with [{JSON:API}](https://jsonapi.org/) hydrator and schema factory for [FastyBird](https://www.fastybird.com) modules
 
 ## Installation
 
