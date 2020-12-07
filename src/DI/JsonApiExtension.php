@@ -36,14 +36,34 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 {
 
 	/**
+	 * @param Nette\Configurator $config
+	 * @param string $extensionName
+	 *
+	 * @return void
+	 */
+	public static function register(
+		Nette\Configurator $config,
+		string $extensionName = 'fbJsonApi'
+	): void {
+		$config->onCompile[] = function (
+			Nette\Configurator $config,
+			DI\Compiler $compiler
+		) use ($extensionName): void {
+			$compiler->addExtension($extensionName, new JsonApiExtension());
+		};
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function getConfigSchema(): Schema\Schema
 	{
 		return Schema\Expect::structure([
 			'meta' => Schema\Expect::structure([
-				'author'    => Schema\Expect::anyOf(Schema\Expect::string(), Schema\Expect::array())->default('FastyBird dev team'),
-				'copyright' => Schema\Expect::string()->default('FastyBird s.r.o'),
+				'author'    => Schema\Expect::anyOf(Schema\Expect::string(), Schema\Expect::array())
+					->default('FastyBird team'),
+				'copyright' => Schema\Expect::string()
+					->default('FastyBird s.r.o'),
 			]),
 		]);
 	}
@@ -106,24 +126,6 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 		return [
 			__DIR__ . '/../Translations',
 		];
-	}
-
-	/**
-	 * @param Nette\Configurator $config
-	 * @param string $extensionName
-	 *
-	 * @return void
-	 */
-	public static function register(
-		Nette\Configurator $config,
-		string $extensionName = 'fbJsonApi'
-	): void {
-		$config->onCompile[] = function (
-			Nette\Configurator $config,
-			DI\Compiler $compiler
-		) use ($extensionName): void {
-			$compiler->addExtension($extensionName, new JsonApiExtension());
-		};
 	}
 
 }

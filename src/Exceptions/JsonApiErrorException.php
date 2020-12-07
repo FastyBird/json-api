@@ -60,6 +60,23 @@ class JsonApiErrorException extends PHPException implements IException, IJsonApi
 	}
 
 	/**
+	 * @return JsonApi\Schema\Error
+	 */
+	public function getError(): JsonApi\Schema\Error
+	{
+		return new JsonApi\Schema\Error(
+			$this->getType(),
+			null,
+			null,
+			(string) $this->code,
+			(string) $this->code,
+			$this->message,
+			$this->getDetail(),
+			$this->getSource()
+		);
+	}
+
+	/**
 	 * @return string|null
 	 */
 	public function getType(): ?string
@@ -81,23 +98,6 @@ class JsonApiErrorException extends PHPException implements IException, IJsonApi
 	public function getSource(): ?array
 	{
 		return $this->source;
-	}
-
-	/**
-	 * @return JsonApi\Schema\Error
-	 */
-	public function getError(): JsonApi\Schema\Error
-	{
-		return new JsonApi\Schema\Error(
-			$this->getType(),
-			null,
-			null,
-			(string) $this->code,
-			(string) $this->code,
-			$this->message,
-			$this->getDetail(),
-			$this->getSource()
-		);
 	}
 
 }

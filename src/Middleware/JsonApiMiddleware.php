@@ -178,7 +178,8 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 					$encoder->withLinks($links);
 
-					if (Utils\Strings::contains($request->getUri()->getPath(), '/relationships/')) {
+					if (Utils\Strings::contains($request->getUri()
+						->getPath(), '/relationships/')) {
 						$encodedData = $encoder->encodeDataAsArray($entity->getData());
 
 						// Try to get "self" link from encoded entity as array
@@ -196,10 +197,11 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 							$linkRelated = str_replace('/relationships/', '/', $this->uriToString($uriRelated));
 
-							$results = $this->getRouterDispatcher()->dispatch(
-								RequestMethodInterface::METHOD_GET,
-								$linkRelated
-							);
+							$results = $this->getRouterDispatcher()
+								->dispatch(
+									RequestMethodInterface::METHOD_GET,
+									$linkRelated
+								);
 
 							if ($results[0] === SlimRouter\Routing\RoutingResults::FOUND) {
 								$encoder->withLinks(array_merge($links, [
@@ -218,7 +220,8 @@ class JsonApiMiddleware implements MiddlewareInterface
 						$content = $encoder->encodeData($entity->getData());
 					}
 
-					$response->getBody()->write($content);
+					$response->getBody()
+						->write($content);
 				}
 			}
 
@@ -229,30 +232,36 @@ class JsonApiMiddleware implements MiddlewareInterface
 				$response = $response->withStatus($ex->getCode());
 
 				if ($ex instanceof Exceptions\JsonApiErrorException) {
-					$content = $this->getEncoder()->encodeError($ex->getError());
+					$content = $this->getEncoder()
+						->encodeError($ex->getError());
 
-					$response->getBody()->write($content);
+					$response->getBody()
+						->write($content);
 
 				} elseif ($ex instanceof Exceptions\JsonApiMultipleErrorException) {
-					$content = $this->getEncoder()->encodeErrors($ex->getErrors());
+					$content = $this->getEncoder()
+						->encodeErrors($ex->getErrors());
 
-					$response->getBody()->write($content);
+					$response->getBody()
+						->write($content);
 				}
 
 			} elseif ($ex instanceof SlimRouter\Exceptions\HttpException) {
 				$response = $response->withStatus($ex->getCode());
 
-				$content = $this->getEncoder()->encodeError(new Schema\Error(
-					null,
-					null,
-					null,
-					(string) $ex->getCode(),
-					(string) $ex->getCode(),
-					$ex->getTitle(),
-					$ex->getDescription()
-				));
+				$content = $this->getEncoder()
+					->encodeError(new Schema\Error(
+						null,
+						null,
+						null,
+						(string) $ex->getCode(),
+						(string) $ex->getCode(),
+						$ex->getTitle(),
+						$ex->getDescription()
+					));
 
-				$response->getBody()->write($content);
+				$response->getBody()
+					->write($content);
 
 			} else {
 				$this->logger->error('[FB::JSON_API] An error occurred during request handling', [
@@ -264,17 +273,19 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 				$response = $response->withStatus(StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR);
 
-				$content = $this->getEncoder()->encodeError(new Schema\Error(
-					null,
-					null,
-					null,
-					(string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR,
-					(string) $ex->getCode(),
-					'Server error',
-					'There was an server error, please try again later'
-				));
+				$content = $this->getEncoder()
+					->encodeError(new Schema\Error(
+						null,
+						null,
+						null,
+						(string) StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR,
+						(string) $ex->getCode(),
+						'Server error',
+						'There was an server error, please try again later'
+					));
 
-				$response->getBody()->write($content);
+				$response->getBody()
+					->write($content);
 			}
 		}
 
@@ -315,29 +326,6 @@ class JsonApiMiddleware implements MiddlewareInterface
 	}
 
 	/**
-	 * @return mixed[]
-	 */
-	private function getBaseMeta(): array
-	{
-		$meta = [];
-
-		if ($this->metaAuthor !== null) {
-			if (is_array($this->metaAuthor)) {
-				$meta['authors'] = $this->metaAuthor;
-
-			} else {
-				$meta['author'] = $this->metaAuthor;
-			}
-		}
-
-		if ($this->metaCopyright !== null) {
-			$meta['copyright'] = $this->metaCopyright;
-		}
-
-		return $meta;
-	}
-
-	/**
 	 * @param UriInterface $uri
 	 *
 	 * @return string
@@ -362,6 +350,29 @@ class JsonApiMiddleware implements MiddlewareInterface
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	private function getBaseMeta(): array
+	{
+		$meta = [];
+
+		if ($this->metaAuthor !== null) {
+			if (is_array($this->metaAuthor)) {
+				$meta['authors'] = $this->metaAuthor;
+
+			} else {
+				$meta['author'] = $this->metaAuthor;
+			}
+		}
+
+		if ($this->metaCopyright !== null) {
+			$meta['copyright'] = $this->metaCopyright;
+		}
+
+		return $meta;
 	}
 
 	/**

@@ -38,8 +38,13 @@ final class BooleanField extends Field
 	 * @param bool $isRequired
 	 * @param bool $isWritable
 	 */
-	public function __construct(bool $isNullable, string $mappedName, string $fieldName, bool $isRequired, bool $isWritable)
-	{
+	public function __construct(
+		bool $isNullable,
+		string $mappedName,
+		string $fieldName,
+		bool $isRequired,
+		bool $isWritable
+	) {
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
 
 		$this->isNullable = $isNullable;

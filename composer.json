@@ -1,7 +1,7 @@
 {
   "name" : "fastybird/json-api",
   "type" : "library",
-  "description" : "FastyBird {JSON:API} api utils with data hydration",
+  "description" : "FastyBird {JSON:API} api tools with data hydration",
   "keywords" : [
     "fastybird",
     "fb",
@@ -18,7 +18,7 @@
   "authors" : [
     {
       "name" : "FastyBird s.r.o.",
-      "email" : "info@fastybird.com",
+      "email" : "code@fastybird.com",
       "homepage" : "https://www.fastybird.com/"
     },
     {

@@ -41,24 +41,6 @@ abstract class JsonApiSchema implements IJsonApiSchema
 
 	/**
 	 * @param DoctrineCrud\Entities\IEntity $resource
-	 *
-	 * @return string|null
-	 *
-	 * @phpstan-param T $resource
-	 *
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
-	 */
-	public function getId($resource): ?string
-	{
-		if ($resource instanceof DoctrineCrud\Entities\IIdentifiedEntity) {
-			return (string) $resource->getId();
-		}
-
-		return null;
-	}
-
-	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
 	 * @param JsonApi\Contracts\Schema\ContextInterface $context
 	 *
 	 * @return iterable<string, mixed>
@@ -70,6 +52,22 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	public function getRelationships($resource, JsonApi\Contracts\Schema\ContextInterface $context): iterable
 	{
 		return [];
+	}
+
+	/**
+	 * @param DoctrineCrud\Entities\IEntity $resource
+	 *
+	 * @return iterable<string, JsonApi\Contracts\Schema\LinkInterface>
+	 *
+	 * @phpstan-param T $resource
+	 *
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+	 */
+	public function getLinks($resource): iterable
+	{
+		return [
+			JsonApi\Contracts\Schema\LinkInterface::SELF => $this->getSelfLink($resource),
+		];
 	}
 
 	/**
@@ -89,17 +87,47 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	/**
 	 * @param DoctrineCrud\Entities\IEntity $resource
 	 *
-	 * @return iterable<string, JsonApi\Contracts\Schema\LinkInterface>
+	 * @return string
 	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getLinks($resource): iterable
+	private function getSelfSubUrl($resource): string
 	{
-		return [
-			JsonApi\Contracts\Schema\LinkInterface::SELF => $this->getSelfLink($resource),
-		];
+		return $this->getResourcesSubUrl() . '/' . $this->getId($resource);
+	}
+
+	/**
+	 * Get resources sub-URL.
+	 *
+	 * @return string
+	 */
+	private function getResourcesSubUrl(): string
+	{
+		if ($this->subUrl === null) {
+			$this->subUrl = '/' . $this->getType();
+		}
+
+		return $this->subUrl;
+	}
+
+	/**
+	 * @param DoctrineCrud\Entities\IEntity $resource
+	 *
+	 * @return string|null
+	 *
+	 * @phpstan-param T $resource
+	 *
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+	 */
+	public function getId($resource): ?string
+	{
+		if ($resource instanceof DoctrineCrud\Entities\IIdentifiedEntity) {
+			return (string) $resource->getId();
+		}
+
+		return null;
 	}
 
 	/**
@@ -208,34 +236,6 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	public function isAddRelatedLinkInRelationshipByDefault(string $relationshipName): bool
 	{
 		return true;
-	}
-
-	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
-	 *
-	 * @return string
-	 *
-	 * @phpstan-param T $resource
-	 *
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
-	 */
-	private function getSelfSubUrl($resource): string
-	{
-		return $this->getResourcesSubUrl() . '/' . $this->getId($resource);
-	}
-
-	/**
-	 * Get resources sub-URL.
-	 *
-	 * @return string
-	 */
-	private function getResourcesSubUrl(): string
-	{
-		if ($this->subUrl === null) {
-			$this->subUrl = '/' . $this->getType();
-		}
-
-		return $this->subUrl;
 	}
 
 }
