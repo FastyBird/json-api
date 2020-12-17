@@ -30,13 +30,13 @@ class JsonApiErrorException extends PHPException implements IException, IJsonApi
 {
 
 	/** @var string|null */
-	private $type = null;
+	private ?string $type = null;
 
 	/** @var string|null */
-	private $detail = null;
+	private ?string $detail = null;
 
 	/** @var mixed[]|null */
-	private $source = null;
+	private ?array $source = null;
 
 	/**
 	 * @param int $code

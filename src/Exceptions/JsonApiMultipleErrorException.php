@@ -31,7 +31,7 @@ class JsonApiMultipleErrorException extends PHPException implements IJsonApiExce
 {
 
 	/** @var JsonApi\Schema\Error[] */
-	private $errors = [];
+	private array $errors = [];
 
 	public function __construct()
 	{
