@@ -111,13 +111,13 @@ abstract class Hydrator
 	protected string $translationDomain = '';
 
 	/** @var mixed[]|null */
-	private ?array $normalizedAttributes;
+	private ?array $normalizedAttributes = null;
 
 	/** @var mixed[]|null */
-	private ?array $normalizedCompositedAttributes;
+	private ?array $normalizedCompositedAttributes = null;
 
 	/** @var mixed[]|null */
-	private ?array $normalizedRelationships;
+	private ?array $normalizedRelationships = null;
 
 	/** @var Persistence\ManagerRegistry */
 	private Persistence\ManagerRegistry $managerRegistry;

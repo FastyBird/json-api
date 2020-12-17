@@ -73,7 +73,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 	private DI\Container $container;
 
 	/** @var FastRouteDispatcher|null */
-	private ?FastRouteDispatcher $routerDispatcher;
+	private ?FastRouteDispatcher $routerDispatcher = null;
 
 	/**
 	 * @param WebServerHttp\ResponseFactory $responseFactory
