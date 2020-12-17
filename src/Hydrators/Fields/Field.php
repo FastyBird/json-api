@@ -31,16 +31,16 @@ abstract class Field implements IField
 	use Nette\SmartObject;
 
 	/** @var string */
-	private $mappedName;
+	private string $mappedName;
 
 	/** @var string */
-	private $fieldName;
+	private string $fieldName;
 
 	/** @var bool */
-	private $isRequired = false;
+	private bool $isRequired;
 
 	/** @var bool */
-	private $isWritable = false;
+	private bool $isWritable;
 
 	public function __construct(
 		string $mappedName,

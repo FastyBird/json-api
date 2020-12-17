@@ -29,7 +29,7 @@ final class BooleanField extends Field
 {
 
 	/** @var bool */
-	private $isNullable = true;
+	private bool $isNullable;
 
 	/**
 	 * @param bool $isNullable

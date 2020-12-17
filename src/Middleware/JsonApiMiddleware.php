@@ -61,19 +61,19 @@ class JsonApiMiddleware implements MiddlewareInterface
 	private $metaAuthor;
 
 	/** @var string */
-	private $metaCopyright;
+	private string $metaCopyright;
 
 	/** @var WebServerHttp\ResponseFactory */
-	private $responseFactory;
+	private WebServerHttp\ResponseFactory $responseFactory;
 
 	/** @var Log\LoggerInterface */
-	private $logger;
+	private Log\LoggerInterface $logger;
 
 	/** @var DI\Container */
-	private $container;
+	private DI\Container $container;
 
 	/** @var FastRouteDispatcher|null */
-	private $routerDispatcher;
+	private ?FastRouteDispatcher $routerDispatcher;
 
 	/**
 	 * @param WebServerHttp\ResponseFactory $responseFactory
@@ -368,9 +368,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 			}
 		}
 
-		if ($this->metaCopyright !== null) {
-			$meta['copyright'] = $this->metaCopyright;
-		}
+		$meta['copyright'] = $this->metaCopyright;
 
 		return $meta;
 	}

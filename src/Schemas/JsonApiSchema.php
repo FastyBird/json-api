@@ -37,7 +37,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	use Nette\SmartObject;
 
 	/** @var string|null */
-	private $subUrl = null;
+	private ?string $subUrl = null;
 
 	/**
 	 * @param DoctrineCrud\Entities\IEntity $resource

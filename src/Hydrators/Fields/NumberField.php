@@ -29,10 +29,10 @@ final class NumberField extends Field
 {
 
 	/** @var bool */
-	private $isDecimal = true;
+	private bool $isDecimal;
 
 	/** @var bool */
-	private $isNullable = true;
+	private bool $isNullable;
 
 	public function __construct(
 		bool $isDecimal,

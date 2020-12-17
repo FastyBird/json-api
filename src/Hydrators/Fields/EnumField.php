@@ -30,10 +30,10 @@ final class EnumField extends Field
 {
 
 	/** @var string */
-	private $typeClass;
+	private string $typeClass;
 
 	/** @var bool */
-	private $isNullable = true;
+	private bool $isNullable = true;
 
 	public function __construct(
 		string $typeClass,

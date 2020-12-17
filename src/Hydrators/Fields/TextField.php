@@ -29,7 +29,7 @@ final class TextField extends Field
 {
 
 	/** @var bool */
-	private $isNullable = true;
+	private bool $isNullable;
 
 	public function __construct(
 		bool $isNullable,

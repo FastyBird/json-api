@@ -27,13 +27,13 @@ abstract class EntityField extends Field
 {
 
 	/** @var string */
-	private $className;
+	private string $className;
 
 	/** @var bool */
-	private $nullable;
+	private bool $nullable;
 
 	/** @var bool */
-	private $isRelationship;
+	private bool $isRelationship;
 
 	public function __construct(
 		string $className,

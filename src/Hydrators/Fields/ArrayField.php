@@ -29,7 +29,7 @@ final class ArrayField extends Field
 {
 
 	/** @var bool */
-	private $isNullable = true;
+	private bool $isNullable;
 
 	public function __construct(
 		bool $isNullable,

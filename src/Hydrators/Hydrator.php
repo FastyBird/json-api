@@ -57,7 +57,7 @@ abstract class Hydrator
 	 *
 	 * @var bool
 	 */
-	protected $entityIdentifier = false;
+	protected bool $entityIdentifier = false;
 
 	/**
 	 * The resource attribute keys to hydrate
@@ -76,7 +76,7 @@ abstract class Hydrator
 	 *
 	 * @var mixed[]
 	 */
-	protected $attributes = [];
+	protected array $attributes = [];
 
 	/**
 	 * The resource composited attribute keys to hydrate
@@ -95,38 +95,38 @@ abstract class Hydrator
 	 *
 	 * @var mixed[]
 	 */
-	protected $compositedAttributes = [];
+	protected array $compositedAttributes = [];
 
 	/**
 	 * Resource relationship keys that should be automatically hydrated
 	 *
 	 * @var string[]
 	 */
-	protected $relationships = [];
+	protected array $relationships = [];
 
 	/** @var Translation\PrefixedTranslator */
-	protected $translator;
+	protected Translation\PrefixedTranslator $translator;
 
 	/** @var string */
-	protected $translationDomain = '';
+	protected string $translationDomain = '';
 
 	/** @var mixed[]|null */
-	private $normalizedAttributes;
+	private ?array $normalizedAttributes;
 
 	/** @var mixed[]|null */
-	private $normalizedCompositedAttributes;
+	private ?array $normalizedCompositedAttributes;
 
 	/** @var mixed[]|null */
-	private $normalizedRelationships;
+	private ?array $normalizedRelationships;
 
 	/** @var Persistence\ManagerRegistry */
-	private $managerRegistry;
+	private Persistence\ManagerRegistry $managerRegistry;
 
 	/** @var Common\Annotations\CachedReader */
-	private $annotationReader;
+	private Common\Annotations\CachedReader $annotationReader;
 
 	/** @var Exceptions\JsonApiMultipleErrorException */
-	private $errors;
+	private Exceptions\JsonApiMultipleErrorException $errors;
 
 	/**
 	 * @param Persistence\ManagerRegistry $managerRegistry
@@ -563,7 +563,7 @@ abstract class Hydrator
 
 		$this->normalizedRelationships = [];
 
-		if ($this->relationships !== null) {
+		if ($this->relationships !== []) {
 			foreach ($this->relationships as $resourceKey => $entityKey) {
 				if (is_numeric($resourceKey)) {
 					$resourceKey = $entityKey;
