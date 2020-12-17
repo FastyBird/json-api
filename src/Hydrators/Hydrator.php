@@ -194,7 +194,7 @@ abstract class Hydrator
 			$relationships
 		));
 
-		if ($entity === null && $this->entityIdentifier !== null) {
+		if ($entity === null) {
 			$identifierKey = $this->entityIdentifier ?? self::IDENTIFIER_KEY;
 
 			try {
