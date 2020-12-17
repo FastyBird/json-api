@@ -55,9 +55,9 @@ abstract class Hydrator
 	/**
 	 * Whether the resource has a client generated id
 	 *
-	 * @var bool
+	 * @var string|null
 	 */
-	protected bool $entityIdentifier = false;
+	protected ?string $entityIdentifier = null;
 
 	/**
 	 * The resource attribute keys to hydrate
@@ -194,8 +194,8 @@ abstract class Hydrator
 			$relationships
 		));
 
-		if ($entity === null && $this->entityIdentifier !== false) {
-			$identifierKey = !is_string($this->entityIdentifier) ? self::IDENTIFIER_KEY : $this->entityIdentifier;
+		if ($entity === null && $this->entityIdentifier !== null) {
+			$identifierKey = $this->entityIdentifier ?? self::IDENTIFIER_KEY;
 
 			try {
 				$identifier = $document->getResource()
