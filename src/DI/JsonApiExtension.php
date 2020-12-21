@@ -77,7 +77,7 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 		/** @var stdClass $configuration */
 		$configuration = $this->getConfig();
 
-		$builder->addDefinition(null)
+		$builder->addDefinition($this->prefix('middlewares.jsonapi'))
 			->setType(Middleware\JsonApiMiddleware::class)
 			->setArgument('metaAuthor', $configuration->meta->author)
 			->setArgument('metaCopyright', $configuration->meta->copyright)
@@ -87,7 +87,7 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 				],
 			]);
 
-		$builder->addDefinition(null)
+		$builder->addDefinition($this->prefix('schemas.container'))
 			->setType(JsonApi\JsonApiSchemaContainer::class);
 	}
 
