@@ -37,7 +37,7 @@ class JsonApiMultipleErrorException extends PHPException implements IJsonApiExce
 	{
 		parent::__construct(
 			'Json:API multiple errors',
-			StatusCodeInterface::STATUS_BAD_REQUEST
+			StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY
 		);
 	}
 

@@ -710,7 +710,7 @@ abstract class Hydrator
 
 			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
-					StatusCodeInterface::STATUS_BAD_REQUEST,
+					StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.heading'),
 					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.message'),
 					[
@@ -926,7 +926,7 @@ abstract class Hydrator
 
 				} elseif ($field->isRequired() && $entity === null) {
 					$this->errors->addError(
-						StatusCodeInterface::STATUS_BAD_REQUEST,
+						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
@@ -1026,7 +1026,7 @@ abstract class Hydrator
 
 					} elseif ($entity === null && $field->isRequired()) {
 						$this->errors->addError(
-							StatusCodeInterface::STATUS_NOT_FOUND,
+							StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 							[
@@ -1037,7 +1037,7 @@ abstract class Hydrator
 
 				} elseif ($entity === null && $field->isRequired()) {
 					$this->errors->addError(
-						StatusCodeInterface::STATUS_BAD_REQUEST,
+						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
@@ -1121,7 +1121,7 @@ abstract class Hydrator
 
 				if ($entity === null && $field->isRequired() && count($relations) === 0) {
 					$this->errors->addError(
-						StatusCodeInterface::STATUS_BAD_REQUEST,
+						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
