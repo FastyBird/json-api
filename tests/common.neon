@@ -15,6 +15,8 @@ php:
 
 extensions:
 	contributteTranslation	: Contributte\Translation\DI\TranslationExtension
+	contributteEvents		: Contributte\EventDispatcher\DI\EventDispatcherExtension
+	contributteConsole		: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
 	fbWebServer				: FastyBird\WebServer\DI\WebServerExtension
 
 contributteTranslation:
@@ -23,3 +25,13 @@ contributteTranslation:
 		fallback: [en_US, en]
 	localeResolvers: []
 	dirs: []
+
+contributteConsole:
+	name: FastyBird:WebServer!
+	version: '1.0'
+	catchExceptions: true
+	autoExit: true
+	url: http://example.com
+	lazy: false
+	helperSet: \Symfony\Component\Console\Helper\HelperSet
+	helpers: []
