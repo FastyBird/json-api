@@ -1,6 +1,6 @@
 # FastyBird {JSON:API} library
 
-[![Build Status](https://badgen.net/github/checks/FastyBird/json-api/master?cache=300&style=flast-square)](https://travis-ci.com/FastyBird/json-api)
+[![Build Status](https://badgen.net/github/checks/FastyBird/json-api/master?cache=300&style=flast-square)](https://github.com/FastyBird/json-api/actions)
 [![Code coverage](https://badgen.net/coveralls/c/github/FastyBird/json-api?cache=300&style=flast-square)](https://coveralls.io/r/FastyBird/json-api)
 ![PHP](https://badgen.net/packagist/php/FastyBird/json-api?cache=300&style=flast-square)
 [![Licence](https://badgen.net/packagist/license/FastyBird/json-api?cache=300&style=flast-square)](https://packagist.org/packages/FastyBird/json-api)
