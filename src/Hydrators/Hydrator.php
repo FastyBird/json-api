@@ -122,8 +122,8 @@ abstract class Hydrator
 	/** @var Persistence\ManagerRegistry */
 	private Persistence\ManagerRegistry $managerRegistry;
 
-	/** @var Common\Annotations\CachedReader */
-	private Common\Annotations\CachedReader $annotationReader;
+	/** @var Common\Annotations\Reader */
+	private Common\Annotations\Reader $annotationReader;
 
 	/** @var Exceptions\JsonApiMultipleErrorException */
 	private Exceptions\JsonApiMultipleErrorException $errors;
@@ -140,10 +140,7 @@ abstract class Hydrator
 	) {
 		$this->managerRegistry = $managerRegistry;
 
-		$this->annotationReader = new Common\Annotations\CachedReader(
-			new Common\Annotations\AnnotationReader(),
-			new Common\Cache\ArrayCache()
-		);
+		$this->annotationReader = new Common\Annotations\AnnotationReader();
 
 		$this->errors = new Exceptions\JsonApiMultipleErrorException();
 
