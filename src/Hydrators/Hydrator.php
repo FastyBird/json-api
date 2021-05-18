@@ -224,6 +224,8 @@ abstract class Hydrator
 	 * @param string $entityClassName
 	 *
 	 * @return Hydrators\Fields\IField[]
+	 *
+	 * @phpstan-param class-string $entityClassName
 	 */
 	protected function mapEntity(string $entityClassName): array
 	{
@@ -233,7 +235,6 @@ abstract class Hydrator
 			return [];
 		}
 
-		/** @var ORM\Mapping\ClassMetadata $classMetadata */
 		$classMetadata = $entityManager->getClassMetadata($entityClassName);
 
 		$reflectionProperties = [];
@@ -665,6 +666,8 @@ abstract class Hydrator
 
 	/**
 	 * @return string
+	 *
+	 * @phpstan-return class-string
 	 */
 	abstract protected function getEntityName(): string;
 

@@ -123,8 +123,11 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	 */
 	public function getId($resource): ?string
 	{
-		if ($resource instanceof DoctrineCrud\Entities\IIdentifiedEntity) {
+		if (method_exists($resource, 'getId')) {
 			return (string) $resource->getId();
+
+		} elseif (property_exists($resource, 'id')) {
+			return (string) $resource->id;
 		}
 
 		return null;
