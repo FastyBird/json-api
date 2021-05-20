@@ -15,7 +15,7 @@ This is a [Nette framework](https://nette.org) extension which is implementing [
 ### Features:
 
 - PSR-7 middleware for transforming response to [{JSON:API}](https://jsonapi.org/) v1.1 response
-- Doctrine2 data hydration from [{JSON:API}](https://jsonapi.org/) document
+- [Doctrine2](https://www.doctrine-project.org) data hydration from [{JSON:API}](https://jsonapi.org/) documents
 - [{JSON:API}](https://jsonapi.org/) schemas for building valid responses
 
 ## Installation
@@ -28,7 +28,7 @@ composer require fastybird/json-api
 
 ## Documentation
 
-Learn how to use {JSON:API} services & data hydrators in [documentation](https://github.com/FastyBird/json-api/blob/master/docs/en/index.md).
+Learn how to use {JSON:API} data hydrators & document builders in [documentation](https://github.com/FastyBird/json-api/blob/master/docs/en/index.md).
 
 ***
 Homepage [https://www.fastybird.com](https://www.fastybird.com) and repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).
