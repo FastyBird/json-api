@@ -16,7 +16,6 @@
 namespace FastyBird\JsonApi\Schemas;
 
 use FastyBird\JsonApi\Exceptions;
-use IPub\DoctrineCrud;
 use Neomerx\JsonApi;
 use Nette;
 
@@ -28,7 +27,7 @@ use Nette;
  *
  * @author             Adam Kadlec <adam.kadlec@fastybird.com>
  *
- * @phpstan-template   T of DoctrineCrud\Entities\IEntity
+ * @phpstan-template   T of object
  * @phpstan-implements IJsonApiSchema<T>
  */
 abstract class JsonApiSchema implements IJsonApiSchema
@@ -40,7 +39,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	private ?string $subUrl = null;
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 * @param JsonApi\Contracts\Schema\ContextInterface $context
 	 *
 	 * @return iterable<string, mixed>
@@ -55,7 +54,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return iterable<string, JsonApi\Contracts\Schema\LinkInterface>
 	 *
@@ -71,7 +70,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return JsonApi\Contracts\Schema\LinkInterface
 	 *
@@ -85,7 +84,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return string
 	 *
@@ -113,7 +112,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return string|null
 	 *
@@ -134,7 +133,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 * @param string $name
 	 *
 	 * @return JsonApi\Contracts\Schema\LinkInterface
@@ -152,7 +151,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 * @param string $name
 	 *
 	 * @return JsonApi\Contracts\Schema\LinkInterface
@@ -170,7 +169,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return bool
 	 *
@@ -184,7 +183,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return mixed
 	 *
@@ -198,7 +197,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return bool
 	 *
@@ -212,7 +211,7 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param DoctrineCrud\Entities\IEntity $resource
+	 * @param object $resource
 	 *
 	 * @return mixed
 	 *

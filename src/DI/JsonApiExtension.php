@@ -16,6 +16,7 @@
 namespace FastyBird\JsonApi\DI;
 
 use Contributte\Translation;
+use FastyBird\JsonApi\Helpers;
 use FastyBird\JsonApi\JsonApi;
 use FastyBird\JsonApi\Middleware;
 use FastyBird\JsonApi\Schemas;
@@ -92,6 +93,11 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 
 		$builder->addDefinition($this->prefix('schemas.container'))
 			->setType(JsonApi\JsonApiSchemaContainer::class);
+
+		if (class_exists('\IPub\DoctrineCrud\Mapping\Annotation\Crud')) {
+			$builder->addDefinition($this->prefix('helpers.crudReader'))
+				->setType(Helpers\CrudReader::class);
+		}
 	}
 
 	/**

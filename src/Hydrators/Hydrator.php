@@ -23,9 +23,9 @@ use Doctrine\Common;
 use Doctrine\ORM;
 use Doctrine\Persistence;
 use FastyBird\JsonApi\Exceptions;
+use FastyBird\JsonApi\Helpers;
 use FastyBird\JsonApi\Hydrators;
 use Fig\Http\Message\StatusCodeInterface;
-use IPub\DoctrineCrud;
 use IPub\JsonAPIDocument;
 use Nette;
 use Nette\Utils;
@@ -44,6 +44,8 @@ use Throwable;
  * @subpackage     Hydrators
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
+ *
+ * @phpstan-template T of object
  */
 abstract class Hydrator
 {
@@ -128,9 +130,13 @@ abstract class Hydrator
 	/** @var Exceptions\JsonApiMultipleErrorException */
 	private Exceptions\JsonApiMultipleErrorException $errors;
 
+	/** @var Helpers\CrudReader|null */
+	private ?Helpers\CrudReader $crudReader;
+
 	public function __construct(
 		Persistence\ManagerRegistry $managerRegistry,
 		Translation\Translator $translator,
+		?Helpers\CrudReader $crudReader = null,
 		?Common\Cache\Cache $cache = null
 	) {
 		$this->managerRegistry = $managerRegistry;
@@ -147,21 +153,24 @@ abstract class Hydrator
 
 		$this->errors = new Exceptions\JsonApiMultipleErrorException();
 
+		$this->crudReader = $crudReader;
 		$this->translator = new Translation\PrefixedTranslator($translator, $this->translationDomain);
 	}
 
 	/**
 	 * @param JsonAPIDocument\IDocument $document
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 *
 	 * @return Utils\ArrayHash
 	 *
 	 * @throws Exceptions\IJsonApiException
 	 * @throws Throwable
+	 *
+	 * @phpstan-param T|null $entity
 	 */
 	public function hydrate(
 		JsonAPIDocument\IDocument $document,
-		?DoctrineCrud\Entities\IEntity $entity = null
+		?object $entity = null
 	): Utils\ArrayHash {
 		$entityMapping = $this->mapEntity($this->getEntityName());
 
@@ -284,14 +293,16 @@ abstract class Hydrator
 				continue;
 			}
 
-			$crud = $this->annotationReader->getPropertyAnnotation($rp, DoctrineCrud\Mapping\Annotation\Crud::class);
+			if ($this->crudReader !== null) {
+				[$isRequired, $isWritable] = $this->crudReader->read($rp) + [false, false];
 
-			if (!$crud instanceof DoctrineCrud\Mapping\Annotation\Crud) {
-				continue;
+			} else {
+				$isRequired = false;
+				$isWritable = true;
 			}
 
 			// Check if field is updatable
-			if (!$crud->isRequired() && !$crud->isWritable()) {
+			if (!$isRequired && !$isWritable) {
 				continue;
 			}
 
@@ -325,7 +336,7 @@ abstract class Hydrator
 
 				// Check if class is callable
 				if (class_exists($className)) {
-					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $crud->isRequired(), $crud->isWritable());
+					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 
 			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAnnotations, true)) {
@@ -335,7 +346,7 @@ abstract class Hydrator
 
 				// Check if class is callable
 				if (class_exists($className)) {
-					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $crud->isRequired(), $crud->isWritable());
+					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 
 			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAnnotations, true)) {
@@ -345,7 +356,7 @@ abstract class Hydrator
 
 				// Check if class is callable
 				if (class_exists($className)) {
-					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $crud->isRequired(), $crud->isWritable());
+					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 
 			} elseif (in_array(ORM\Mapping\ManyToOne::class, $propertyAnnotations, true)) {
@@ -355,7 +366,7 @@ abstract class Hydrator
 
 				// Check if class is callable
 				if (class_exists($className)) {
-					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $crud->isRequired(), $crud->isWritable());
+					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 
 			} else {
@@ -444,8 +455,8 @@ abstract class Hydrator
 							$isNullable,
 							$mappedKey,
 							$fieldName,
-							$crud->isRequired(),
-							$crud->isWritable()
+							$isRequired,
+							$isWritable
 						);
 
 					} elseif ($isClass && $className !== null) {
@@ -457,8 +468,8 @@ abstract class Hydrator
 									$isNullable,
 									$mappedKey,
 									$fieldName,
-									$crud->isRequired(),
-									$crud->isWritable()
+									$isRequired,
+									$isWritable
 								);
 
 							} elseif ($typeRc->isSubclassOf(Consistence\Enum\Enum::class)) {
@@ -467,8 +478,8 @@ abstract class Hydrator
 									$isNullable,
 									$mappedKey,
 									$fieldName,
-									$crud->isRequired(),
-									$crud->isWritable()
+									$isRequired,
+									$isWritable
 								);
 
 							} elseif ($typeRc->implementsInterface(ArrayAccess::class)) {
@@ -476,8 +487,8 @@ abstract class Hydrator
 									$isNullable,
 									$mappedKey,
 									$fieldName,
-									$crud->isRequired(),
-									$crud->isWritable()
+									$isRequired,
+									$isWritable
 								);
 
 							} else {
@@ -487,8 +498,8 @@ abstract class Hydrator
 									$mappedKey,
 									$isRelationship,
 									$fieldName,
-									$crud->isRequired(),
-									$crud->isWritable()
+									$isRequired,
+									$isWritable
 								);
 							}
 
@@ -499,8 +510,8 @@ abstract class Hydrator
 								$mappedKey,
 								$isRelationship,
 								$fieldName,
-								$crud->isRequired(),
-								$crud->isWritable()
+								$isRequired,
+								$isWritable
 							);
 						}
 
@@ -509,8 +520,8 @@ abstract class Hydrator
 							$isNullable,
 							$mappedKey,
 							$fieldName,
-							$crud->isRequired(),
-							$crud->isWritable()
+							$isRequired,
+							$isWritable
 						);
 
 					} elseif ($isNumber || $isDecimal) {
@@ -519,8 +530,8 @@ abstract class Hydrator
 							$isNullable,
 							$mappedKey,
 							$fieldName,
-							$crud->isRequired(),
-							$crud->isWritable()
+							$isRequired,
+							$isWritable
 						);
 
 					} elseif ($isArray) {
@@ -528,8 +539,8 @@ abstract class Hydrator
 							$isNullable,
 							$mappedKey,
 							$fieldName,
-							$crud->isRequired(),
-							$crud->isWritable()
+							$isRequired,
+							$isWritable
 						);
 
 					} elseif ($isBool) {
@@ -537,8 +548,8 @@ abstract class Hydrator
 							$isNullable,
 							$mappedKey,
 							$fieldName,
-							$crud->isRequired(),
-							$crud->isWritable()
+							$isRequired,
+							$isWritable
 						);
 					}
 				}
@@ -687,16 +698,18 @@ abstract class Hydrator
 	 * @param string $className
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 * @param Hydrators\Fields\IField[] $entityMapping
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 * @param string|null $rootField
 	 *
 	 * @return mixed[]
+	 *
+	 * @phpstan-param T|null $entity
 	 */
 	protected function hydrateAttributes(
 		string $className,
 		JsonAPIDocument\Objects\IStandardObject $attributes,
 		array $entityMapping,
-		?DoctrineCrud\Entities\IEntity $entity,
+		?object $entity,
 		?string $rootField
 	): array {
 		$data = [];
@@ -826,14 +839,16 @@ abstract class Hydrator
 	 *
 	 * @param string $attributeKey
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 *
 	 * @return mixed|null
+	 *
+	 * @phpstan-param T|null $entity
 	 */
 	private function callHydrateAttribute(
 		string $attributeKey,
 		JsonAPIDocument\Objects\IStandardObject $attributes,
-		?DoctrineCrud\Entities\IEntity $entity = null
+		?object $entity = null
 	) {
 		$method = $this->methodForAttribute($attributeKey);
 
@@ -883,15 +898,17 @@ abstract class Hydrator
 	 * @param JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 *
 	 * @return mixed[]
+	 *
+	 * @phpstan-param T|null $entity
 	 */
 	protected function hydrateRelationships(
 		JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships,
 		array $entityMapping,
 		?JsonAPIDocument\Objects\IResourceObjectCollection $included = null,
-		?DoctrineCrud\Entities\IEntity $entity = null
+		?object $entity = null
 	): array {
 		$data = [];
 
@@ -958,15 +975,17 @@ abstract class Hydrator
 	 * @param string $relationshipKey
 	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
 	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 *
-	 * @return mixed[]|DoctrineCrud\Entities\IEntity|null
+	 * @return mixed[]|object|null
+	 *
+	 * @phpstan-param T|null $entity
 	 */
 	private function callHydrateRelationship(
 		string $relationshipKey,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
 		?JsonAPIDocument\Objects\IResourceObjectCollection $included = null,
-		?DoctrineCrud\Entities\IEntity $entity = null
+		?object $entity = null
 	) {
 		$method = $this->methodForRelationship($relationshipKey);
 
@@ -982,12 +1001,12 @@ abstract class Hydrator
 			if (
 				$result === null
 				|| is_array($result)
-				|| $result instanceof DoctrineCrud\Entities\IEntity
+				|| is_object($result)
 			) {
 				return $result;
 			}
 
-			throw new Exceptions\InvalidStateException(sprintf('Relationship have to be an array or entity instance, %s provided.', get_class($result)));
+			throw new Exceptions\InvalidStateException(sprintf('Relationship have to be an array or entity instance, %s provided.', gettype($result)));
 		}
 
 		return null;
@@ -1013,17 +1032,21 @@ abstract class Hydrator
 	 *
 	 * @param Hydrators\Fields\IField $field
 	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 *
-	 * @return DoctrineCrud\Entities\IEntity|null
+	 * @return object|null
+	 *
+	 * @phpstan-param T|null $entity
+	 *
+	 * @phpstan-return T|null
 	 */
 	protected function hydrateHasOne(
 		Hydrators\Fields\IField $field,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
-		?DoctrineCrud\Entities\IEntity $entity,
+		?object $entity,
 		array $entityMapping
-	): ?DoctrineCrud\Entities\IEntity {
+	): ?object {
 		// Find relationship field
 		if (
 			$field instanceof Hydrators\Fields\EntityField
@@ -1067,12 +1090,14 @@ abstract class Hydrator
 	 * @param string $entityClassName
 	 * @param JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
 	 *
-	 * @return DoctrineCrud\Entities\IEntity|null
+	 * @return object|null
+	 *
+	 * @phpstan-return T|null
 	 */
 	private function findRelated(
 		string $entityClassName,
 		JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
-	): ?DoctrineCrud\Entities\IEntity {
+	): ?object {
 		if (!Uuid\Uuid::isValid($identifier->getId())) {
 			return null;
 		}
@@ -1084,7 +1109,7 @@ abstract class Hydrator
 		$entityManager = $this->managerRegistry->getManagerForClass($entityClassName);
 
 		if ($entityManager !== null) {
-			/** @var DoctrineCrud\Entities\IEntity|null $entity */
+			/** @phpstan-var T|null $entity */
 			$entity = $entityManager
 				->getRepository($entityClassName)
 				->find($identifier->getId());
@@ -1100,15 +1125,19 @@ abstract class Hydrator
 	 *
 	 * @param Hydrators\Fields\IField $field
 	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
-	 * @param DoctrineCrud\Entities\IEntity|null $entity
+	 * @param object|null $entity
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 *
-	 * @return DoctrineCrud\Entities\IEntity[]
+	 * @return object[]
+	 *
+	 * @phpstan-param T|null $entity
+	 *
+	 * @phpstan-return Array<int, T>
 	 */
 	protected function hydrateHasMany(
 		Hydrators\Fields\IField $field,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
-		?DoctrineCrud\Entities\IEntity $entity,
+		?object $entity,
 		array $entityMapping
 	): array {
 		$relations = [];
