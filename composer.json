@@ -32,19 +32,20 @@
   "minimum-stability" : "stable",
 
   "require" : {
-    "php" : ">=7.4.0",
-    "ext-json" : "*",
-    "consistence/consistence" : "^2.0",
-    "contributte/translation" : "^0.8",
-    "fastybird/web-server" : "^0.1",
-    "ipub/doctrine-crud" : "^3.0",
-    "ipub/json-api-document" : "^0.1",
-    "nette/bootstrap" : "^3.1",
-    "nette/di" : "^3.0",
-    "nette/utils" : "^3.2",
-    "phpdocumentor/reflection-docblock" : "^5.2",
-    "psr/log" : "^1.1",
-    "ramsey/uuid" : "^4.1"
+    "php": ">=7.4.0",
+    "ext-json": "*",
+    "consistence/consistence": "^2.0",
+    "contributte/translation": "^0.8",
+    "fastybird/web-server": "^0.1",
+    "ipub/doctrine-crud": "^3.0",
+    "ipub/json-api-document": "^0.2",
+    "neomerx/json-api": "^4.0",
+    "nette/bootstrap": "^3.1",
+    "nette/di": "^3.0",
+    "nette/utils": "^3.2",
+    "phpdocumentor/reflection-docblock": "^5.2",
+    "psr/log": "^1.1",
+    "ramsey/uuid": "^4.1"
   },
 
   "require-dev" : {

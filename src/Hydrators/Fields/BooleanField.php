@@ -51,7 +51,7 @@ final class BooleanField extends Field
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return bool|null
 	 */

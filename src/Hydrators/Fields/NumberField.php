@@ -49,7 +49,7 @@ final class NumberField extends Field
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return float|int|null
 	 */
@@ -57,7 +57,7 @@ final class NumberField extends Field
 	{
 		$value = $attributes->get($this->getMappedName());
 
-		return $value !== null ? ($this->isDecimal ? (float) $value : (int) $value) : null;
+		return $value !== null && is_scalar($value) ? ($this->isDecimal ? (float) $value : (int) $value) : null;
 	}
 
 	/**

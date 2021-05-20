@@ -49,7 +49,7 @@ interface IField
 	public function isWritable(): bool;
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return mixed
 	 */

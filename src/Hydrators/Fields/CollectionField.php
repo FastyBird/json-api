@@ -30,7 +30,7 @@ final class CollectionField extends EntityField
 {
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return void
 	 */

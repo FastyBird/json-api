@@ -151,7 +151,7 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param JsonAPIDocument\IDocument<JsonAPIDocument\Objects\StandardObject> $document
+	 * @param JsonAPIDocument\IDocument $document
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 *
 	 * @return Utils\ArrayHash
@@ -165,18 +165,29 @@ abstract class Hydrator
 	): Utils\ArrayHash {
 		$entityMapping = $this->mapEntity($this->getEntityName());
 
+		$resource = $document->getResource();
+
+		if ($resource === null) {
+			throw new Exceptions\JsonApiErrorException(
+				StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
+				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.heading'),
+				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.message'),
+				[
+					'pointer' => 'data',
+				]
+			);
+		}
+
 		$attributes = $this->hydrateAttributes(
 			$this->getEntityName(),
-			$document->getResource()
-				->getAttributes(),
+			$resource->getAttributes(),
 			$entityMapping,
 			$entity,
 			null
 		);
 
 		$relationships = $this->hydrateRelationships(
-			$document->getResource()
-				->getRelationships(),
+			$resource->getRelationships(),
 			$entityMapping,
 			$document->getIncluded(),
 			$entity
@@ -198,9 +209,7 @@ abstract class Hydrator
 			$identifierKey = $this->entityIdentifier ?? self::IDENTIFIER_KEY;
 
 			try {
-				$identifier = $document->getResource()
-					->getIdentifier()
-					->getId();
+				$identifier = $resource->getId();
 
 				if (!Uuid\Uuid::isValid($identifier)) {
 					throw new Exceptions\JsonApiErrorException(
@@ -676,7 +685,7 @@ abstract class Hydrator
 
 	/**
 	 * @param string $className
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 * @param string|null $rootField
@@ -726,7 +735,7 @@ abstract class Hydrator
 					// Get attribute entity class name
 					$fieldClassName = $field->getClassName();
 
-					/** @var string|JsonAPIDocument\Objects\IStandardObject<mixed> $fieldAttributes */
+					/** @var string|JsonAPIDocument\Objects\IStandardObject<string, mixed> $fieldAttributes */
 					$fieldAttributes = $attributes->get($field->getMappedName());
 
 					if ($fieldAttributes instanceof JsonAPIDocument\Objects\IStandardObject) {
@@ -816,7 +825,7 @@ abstract class Hydrator
 	 * Hydrate a attribute by invoking a method on this hydrator.
 	 *
 	 * @param string $attributeKey
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 *
 	 * @return mixed|null
@@ -871,7 +880,7 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IRelationships<mixed> $relationships
+	 * @param JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
@@ -879,7 +888,7 @@ abstract class Hydrator
 	 * @return mixed[]
 	 */
 	protected function hydrateRelationships(
-		JsonAPIDocument\Objects\IRelationships $relationships,
+		JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships,
 		array $entityMapping,
 		?JsonAPIDocument\Objects\IResourceObjectCollection $included = null,
 		?DoctrineCrud\Entities\IEntity $entity = null
@@ -889,7 +898,7 @@ abstract class Hydrator
 		foreach ($entityMapping as $field) {
 			if ($field instanceof Hydrators\Fields\EntityField && $field->isRelationship()) {
 				if ($relationships->has($field->getMappedName())) {
-					$relationship = $relationships->getRelationship($field->getMappedName());
+					$relationship = $relationships->get($field->getMappedName());
 
 					// If there is a specific method for this relationship, we'll hydrate that
 					$result = $this->callHydrateRelationship(
@@ -947,7 +956,7 @@ abstract class Hydrator
 	 * Hydrate a relationship by invoking a method on this hydrator.
 	 *
 	 * @param string $relationshipKey
-	 * @param JsonAPIDocument\Objects\IRelationship<mixed> $relationship
+	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
 	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 *
@@ -955,7 +964,7 @@ abstract class Hydrator
 	 */
 	private function callHydrateRelationship(
 		string $relationshipKey,
-		JsonAPIDocument\Objects\IRelationship $relationship,
+		JsonAPIDocument\Objects\IRelationshipObject $relationship,
 		?JsonAPIDocument\Objects\IResourceObjectCollection $included = null,
 		?DoctrineCrud\Entities\IEntity $entity = null
 	) {
@@ -1003,7 +1012,7 @@ abstract class Hydrator
 	 * Hydrate a resource has-one relationship
 	 *
 	 * @param Hydrators\Fields\IField $field
-	 * @param JsonAPIDocument\Objects\IRelationship<mixed> $relationship
+	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 *
@@ -1011,7 +1020,7 @@ abstract class Hydrator
 	 */
 	protected function hydrateHasOne(
 		Hydrators\Fields\IField $field,
-		JsonAPIDocument\Objects\IRelationship $relationship,
+		JsonAPIDocument\Objects\IRelationshipObject $relationship,
 		?DoctrineCrud\Entities\IEntity $entity,
 		array $entityMapping
 	): ?DoctrineCrud\Entities\IEntity {
@@ -1021,7 +1030,7 @@ abstract class Hydrator
 			&& $field->isRelationship()
 		) {
 			if ($field->isWritable() || ($entity === null && $field->isRequired())) {
-				if ($relationship->getData() !== null && $relationship->getIdentifier() !== null) {
+				if ($relationship->hasIdentifier()) {
 					$relationEntity = $this->findRelated($field->getClassName(), $relationship->getIdentifier());
 
 					if ($relationEntity !== null) {
@@ -1056,13 +1065,13 @@ abstract class Hydrator
 
 	/**
 	 * @param string $entityClassName
-	 * @param JsonAPIDocument\Objects\IResourceIdentifier<mixed> $identifier
+	 * @param JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
 	 *
 	 * @return DoctrineCrud\Entities\IEntity|null
 	 */
 	private function findRelated(
 		string $entityClassName,
-		JsonAPIDocument\Objects\IResourceIdentifier $identifier
+		JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
 	): ?DoctrineCrud\Entities\IEntity {
 		if (!Uuid\Uuid::isValid($identifier->getId())) {
 			return null;
@@ -1090,7 +1099,7 @@ abstract class Hydrator
 	 * Hydrate a resource has-many relationship
 	 *
 	 * @param Hydrators\Fields\IField $field
-	 * @param JsonAPIDocument\Objects\IRelationship<mixed> $relationship
+	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
 	 * @param DoctrineCrud\Entities\IEntity|null $entity
 	 * @param Hydrators\Fields\IField[] $entityMapping
 	 *
@@ -1098,7 +1107,7 @@ abstract class Hydrator
 	 */
 	protected function hydrateHasMany(
 		Hydrators\Fields\IField $field,
-		JsonAPIDocument\Objects\IRelationship $relationship,
+		JsonAPIDocument\Objects\IRelationshipObject $relationship,
 		?DoctrineCrud\Entities\IEntity $entity,
 		array $entityMapping
 	): array {
@@ -1110,14 +1119,12 @@ abstract class Hydrator
 			&& $field->isRelationship()
 		) {
 			if ($field->isWritable() || ($entity === null && $field->isRequired())) {
-				if ($relationship->getData() instanceof JsonAPIDocument\Objects\IResourceIdentifierCollection) {
-					foreach ($relationship->getData() as $relation) {
-						if ($relation instanceof JsonAPIDocument\Objects\IResourceIdentifier) {
-							$relationEntity = $this->findRelated($field->getClassName(), $relation);
+				if ($relationship->isHasMany()) {
+					foreach ($relationship->getIdentifiers() as $identifier) {
+						$relationEntity = $this->findRelated($field->getClassName(), $identifier);
 
-							if ($relationEntity !== null) {
-								$relations[] = $relationEntity;
-							}
+						if ($relationEntity !== null) {
+							$relations[] = $relationEntity;
 						}
 					}
 				}

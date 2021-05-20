@@ -44,7 +44,7 @@ final class TextField extends Field
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return string|null
 	 */
@@ -52,7 +52,7 @@ final class TextField extends Field
 	{
 		$value = $attributes->get($this->getMappedName());
 
-		return $value !== null ? ($this->isNullable && $value === '' ? null : (string) $value) : null;
+		return $value !== null && is_scalar($value) ? ($this->isNullable && $value === '' ? null : (string) $value) : null;
 	}
 
 	/**

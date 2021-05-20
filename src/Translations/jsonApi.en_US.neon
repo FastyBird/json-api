@@ -17,6 +17,9 @@ hydrator:
 	invalidIdentifier:
 		heading	: "Invalid identifier"
 		message	: "Provided entity identifier is not valid"
+	invalidResource:
+		heading	: "Invalid resource"
+		message	: "Provided resource structure is not valid"
 	missingRequiredAttribute:
 		heading	: "Missing required attribute"
 		message	: "Provided request is missing required attribute"

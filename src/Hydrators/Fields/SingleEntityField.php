@@ -30,7 +30,7 @@ final class SingleEntityField extends EntityField
 {
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return mixed[]|null
 	 */
@@ -53,7 +53,7 @@ final class SingleEntityField extends EntityField
 			return null;
 		}
 
-		return $value;
+		return is_array($value) ? $value : null;
 	}
 
 }
