@@ -60,8 +60,8 @@ class JsonApiMiddleware implements MiddlewareInterface
 	/** @var string|string[] */
 	private $metaAuthor;
 
-	/** @var string */
-	private string $metaCopyright;
+	/** @var string|null */
+	private ?string $metaCopyright;
 
 	/** @var WebServerHttp\ResponseFactory */
 	private WebServerHttp\ResponseFactory $responseFactory;
@@ -79,14 +79,14 @@ class JsonApiMiddleware implements MiddlewareInterface
 	 * @param WebServerHttp\ResponseFactory $responseFactory
 	 * @param DI\Container $container
 	 * @param string|string[] $metaAuthor
-	 * @param string $metaCopyright
+	 * @param string|null $metaCopyright
 	 * @param Log\LoggerInterface|null $logger
 	 */
 	public function __construct(
 		WebServerHttp\ResponseFactory $responseFactory,
 		DI\Container $container,
 		$metaAuthor,
-		string $metaCopyright,
+		?string $metaCopyright = null,
 		?Log\LoggerInterface $logger = null
 	) {
 		$this->responseFactory = $responseFactory;
@@ -178,8 +178,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 					$encoder->withLinks($links);
 
-					if (Utils\Strings::contains($request->getUri()
-						->getPath(), '/relationships/')) {
+					if (Utils\Strings::contains($request->getUri()->getPath(), '/relationships/')) {
 						$encodedData = $encoder->encodeDataAsArray($entity->getData());
 
 						// Try to get "self" link from encoded entity as array
@@ -289,21 +288,8 @@ class JsonApiMiddleware implements MiddlewareInterface
 			}
 		}
 
-		$allowedMethods = [
-			RequestMethodInterface::METHOD_GET,
-			RequestMethodInterface::METHOD_POST,
-			RequestMethodInterface::METHOD_PATCH,
-			RequestMethodInterface::METHOD_DELETE,
-			RequestMethodInterface::METHOD_OPTIONS,
-		];
-
 		// Setup content type
 		return $response
-			// CORS headers
-			->withHeader('Access-Control-Allow-Origin', '*')
-			->withHeader('Access-Control-Allow-Methods', implode(',', $allowedMethods))
-			->withHeader('Access-Control-Allow-Credentials', 'true')
-			->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Api-Key')
 			// Content headers
 			->withHeader('Content-Type', Contracts\Http\Headers\MediaTypeInterface::JSON_API_MEDIA_TYPE);
 	}
@@ -368,7 +354,9 @@ class JsonApiMiddleware implements MiddlewareInterface
 			}
 		}
 
-		$meta['copyright'] = $this->metaCopyright;
+		if ($this->metaCopyright !== null) {
+			$meta['copyright'] = $this->metaCopyright;
+		}
 
 		return $meta;
 	}

@@ -63,7 +63,10 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 				'author'    => Schema\Expect::anyOf(Schema\Expect::string(), Schema\Expect::array())
 					->default('FastyBird team'),
 				'copyright' => Schema\Expect::string()
-					->default('FastyBird s.r.o'),
+					->default(null)->nullable(),
+			]),
+			'middleware' => Schema\Expect::structure([
+				'priority' => Schema\Expect::int()->default(100),
 			]),
 		]);
 	}
@@ -83,7 +86,7 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 			->setArgument('metaCopyright', $configuration->meta->copyright)
 			->setTags([
 				'middleware' => [
-					'priority' => 100,
+					'priority' => $configuration->middleware->priority,
 				],
 			]);
 

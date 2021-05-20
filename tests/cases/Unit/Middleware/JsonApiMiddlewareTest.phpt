@@ -124,7 +124,7 @@ final class JsonApiMiddlewareTest extends BaseMockeryTestCase
 			->getMock()
 			->shouldReceive('withHeader')
 			->andReturn($response)
-			->times(5);
+			->times(1);
 
 		$handler = Mockery::mock(RequestHandlerInterface::class);
 		$handler

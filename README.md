@@ -14,9 +14,9 @@ This is a [Nette framework](https://nette.org) extension which is implementing [
 
 ### Features:
 
-- PSR-7 middleware for transforming response to {JSON:API} v1.1 response
-- Doctrine2 data hydration from {JSON:API} document
-- {JSON:API} schemas for building valid responses
+- PSR-7 middleware for transforming response to [{JSON:API}](https://jsonapi.org/) v1.1 response
+- Doctrine2 data hydration from [{JSON:API}](https://jsonapi.org/) document
+- [{JSON:API}](https://jsonapi.org/) schemas for building valid responses
 
 ## Installation
 
