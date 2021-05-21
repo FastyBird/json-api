@@ -452,6 +452,41 @@ services:
 
 And this extension wil find it automatically and register them to response encoder. No need to do more.
 
+# Tip
+
+For better results for hydrator you could use [ipub/doctrine-crud](https://github.com/ipublikuj/doctrine-crud) package. This packages has special annotation for entity atributes and with this annotation you could define which field is required for new entity or which field is writable:
+
+```php
+namespace Your\CoolApplication\Data;
+
+use IPub\DoctrineCrud\Mapping\Annotation as IPubDoctrine;
+
+class ArticleEntity
+{
+
+    /**
+     * @var string
+     *
+     * @IPubDoctrine\Crud(is="required")
+     * @ORM\Column(type="string", nullable=false)
+     */
+    protected string $title;
+
+    /**
+     * @var string
+     *
+     * @IPubDoctrine\Crud(is={"required", "writable"})
+     * @ORM\Column(type="string", nullable=false)
+     */
+    protected string $content;
+
+}
+```
+
+As you can see, **title** attribute is required and have to be present during hydration, but will be skipped when in hydration call is used existing entity.
+And **content** attribute is also writable, so is hydrated when new entity is created and also when entity is updated.
+
+With this package you could use one hydrator service for both states - creating entity and updating entity.
 
 ***
 Homepage [https://www.fastybird.com](https://www.fastybird.com) and repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).
