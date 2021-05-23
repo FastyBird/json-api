@@ -174,9 +174,7 @@ abstract class Hydrator
 	): Utils\ArrayHash {
 		$entityMapping = $this->mapEntity($this->getEntityName());
 
-		$resource = $document->getResource();
-
-		if ($resource === null) {
+		if (!$document->hasResource()) {
 			throw new Exceptions\JsonApiErrorException(
 				StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.heading'),
@@ -186,6 +184,8 @@ abstract class Hydrator
 				]
 			);
 		}
+
+		$resource = $document->getResource();
 
 		$attributes = $this->hydrateAttributes(
 			$this->getEntityName(),
