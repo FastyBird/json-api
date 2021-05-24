@@ -198,7 +198,7 @@ abstract class Hydrator
 		$relationships = $this->hydrateRelationships(
 			$resource->getRelationships(),
 			$entityMapping,
-			$document->getIncluded(),
+			$document->hasIncluded() ? $document->getIncluded() : null,
 			$entity
 		);
 
