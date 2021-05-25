@@ -220,7 +220,7 @@ abstract class Hydrator
 			try {
 				$identifier = $resource->getId();
 
-				if (!Uuid\Uuid::isValid($identifier)) {
+				if ($identifier === null || !Uuid\Uuid::isValid($identifier)) {
 					throw new Exceptions\JsonApiErrorException(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.heading'),
@@ -1098,7 +1098,7 @@ abstract class Hydrator
 		string $entityClassName,
 		JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
 	): ?object {
-		if (!Uuid\Uuid::isValid($identifier->getId())) {
+		if ($identifier->getId() === null || !Uuid\Uuid::isValid($identifier->getId())) {
 			return null;
 		}
 
