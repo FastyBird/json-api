@@ -11,7 +11,7 @@ The best way to install **fastybird/json-api** is using [Composer](http://getcom
 composer require fastybird/json-api
 ```
 
-After that you have to register extension in *config.neon*.
+After that, you have to register extension in *config.neon*.
 
 ```neon
 extensions:
