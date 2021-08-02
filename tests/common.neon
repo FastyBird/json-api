@@ -17,7 +17,7 @@ extensions:
 	contributteTranslation	: Contributte\Translation\DI\TranslationExtension
 	contributteEvents		: Contributte\EventDispatcher\DI\EventDispatcherExtension
 	contributteConsole		: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
-	fbWebServer				: FastyBird\WebServer\DI\WebServerExtension
+	fbWebServer				: FastyBird\WebServer\DI\WebServerExtension(%consoleMode%)
 
 contributteTranslation:
 	locales:
