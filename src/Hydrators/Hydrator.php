@@ -267,7 +267,6 @@ abstract class Hydrator
 			} else {
 				throw new Exceptions\InvalidStateException('Entity could not be parsed');
 			}
-
 		} catch (ReflectionException $ex) {
 			throw new Exceptions\InvalidStateException('Entity could not be parsed');
 		}
@@ -338,7 +337,6 @@ abstract class Hydrator
 				if (class_exists($className)) {
 					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
-
 			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAnnotations, true)) {
 				/** @var ORM\Mapping\OneToMany $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToMany::class);
@@ -348,7 +346,6 @@ abstract class Hydrator
 				if (class_exists($className)) {
 					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
-
 			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAnnotations, true)) {
 				/** @var ORM\Mapping\ManyToMany $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToMany::class);
@@ -358,7 +355,6 @@ abstract class Hydrator
 				if ($className !== null && class_exists($className)) {
 					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
-
 			} elseif (in_array(ORM\Mapping\ManyToOne::class, $propertyAnnotations, true)) {
 				/** @var ORM\Mapping\ManyToOne $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToOne::class);
@@ -368,7 +364,6 @@ abstract class Hydrator
 				if (class_exists($className)) {
 					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
-
 			} else {
 				$varAnnotation = $this->parseAnnotation($rp, 'var');
 
@@ -380,7 +375,6 @@ abstract class Hydrator
 					if ($returnType instanceof ReflectionNamedType) {
 						$varAnnotation = ($varAnnotation === null ? '' : $varAnnotation . '|') . $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
 					}
-
 				} catch (ReflectionException $ex) {
 					// Nothing to do
 				}
@@ -502,7 +496,6 @@ abstract class Hydrator
 									$isWritable
 								);
 							}
-
 						} catch (ReflectionException $ex) {
 							$fields[] = new Hydrators\Fields\SingleEntityField(
 								$className,
@@ -514,7 +507,6 @@ abstract class Hydrator
 								$isWritable
 							);
 						}
-
 					} elseif ($isString) {
 						$fields[] = new Hydrators\Fields\TextField(
 							$isNullable,
@@ -763,11 +755,9 @@ abstract class Hydrator
 						if (!isset($data[$field->getFieldName()]['entity'])) {
 							$data[$field->getFieldName()]['entity'] = $fieldClassName;
 						}
-
 					} elseif ($value !== null || $field->isNullable()) {
 						$data[$field->getFieldName()] = $value;
 					}
-
 				} else {
 					$data[$field->getFieldName()] = $value;
 				}
@@ -804,7 +794,6 @@ abstract class Hydrator
 
 				$data['entity'] = $className;
 			}
-
 		} catch (Throwable $ex) {
 			// Nothing to do here
 		}
@@ -952,7 +941,6 @@ abstract class Hydrator
 
 						$data[$field->getFieldName()] = $relationshipEntities;
 					}
-
 				} elseif ($field->isRequired() && $entity === null) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
@@ -1069,7 +1057,6 @@ abstract class Hydrator
 							]
 						);
 					}
-
 				} elseif ($entity === null && $field->isRequired()) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,

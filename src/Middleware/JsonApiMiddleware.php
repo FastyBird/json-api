@@ -223,7 +223,6 @@ class JsonApiMiddleware implements MiddlewareInterface
 						->write($content);
 				}
 			}
-
 		} catch (Throwable $ex) {
 			$response = $this->responseFactory->createResponse();
 
@@ -236,7 +235,6 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 					$response->getBody()
 						->write($content);
-
 				} elseif ($ex instanceof Exceptions\JsonApiMultipleErrorException) {
 					$content = $this->getEncoder()
 						->encodeErrors($ex->getErrors());
@@ -244,7 +242,6 @@ class JsonApiMiddleware implements MiddlewareInterface
 					$response->getBody()
 						->write($content);
 				}
-
 			} elseif ($ex instanceof SlimRouter\Exceptions\HttpException) {
 				$response = $response->withStatus($ex->getCode());
 
