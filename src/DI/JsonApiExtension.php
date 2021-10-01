@@ -94,8 +94,8 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 		$builder->addDefinition($this->prefix('schemas.container'), new DI\Definitions\ServiceDefinition())
 			->setType(JsonApi\JsonApiSchemaContainer::class);
 
-		if (class_exists('\IPub\DoctrineCrud\Mapping\Annotation\Crud'), new DI\Definitions\ServiceDefinition()) {
-			$builder->addDefinition($this->prefix('helpers.crudReader'))
+		if (class_exists('\IPub\DoctrineCrud\Mapping\Annotation\Crud')) {
+			$builder->addDefinition($this->prefix('helpers.crudReader'), new DI\Definitions\ServiceDefinition())
 				->setType(Helpers\CrudReader::class);
 		}
 	}
