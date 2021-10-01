@@ -37,7 +37,7 @@
     "consistence-community/consistence": "^2.1",
     "contributte/translation": "^0.8",
     "doctrine/orm": "^2.6",
-    "fastybird/web-server": "^0.1",
+    "fastybird/web-server": "^0.2",
     "ipub/json-api-document": "^0.2",
     "neomerx/json-api": "^4.0",
     "nette/bootstrap": "^3.1",

@@ -81,7 +81,7 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 		/** @var stdClass $configuration */
 		$configuration = $this->getConfig();
 
-		$builder->addDefinition($this->prefix('middlewares.jsonapi'))
+		$builder->addDefinition($this->prefix('middlewares.jsonapi'), new DI\Definitions\ServiceDefinition())
 			->setType(Middleware\JsonApiMiddleware::class)
 			->setArgument('metaAuthor', $configuration->meta->author)
 			->setArgument('metaCopyright', $configuration->meta->copyright)
@@ -91,10 +91,10 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 				],
 			]);
 
-		$builder->addDefinition($this->prefix('schemas.container'))
+		$builder->addDefinition($this->prefix('schemas.container'), new DI\Definitions\ServiceDefinition())
 			->setType(JsonApi\JsonApiSchemaContainer::class);
 
-		if (class_exists('\IPub\DoctrineCrud\Mapping\Annotation\Crud')) {
+		if (class_exists('\IPub\DoctrineCrud\Mapping\Annotation\Crud'), new DI\Definitions\ServiceDefinition()) {
 			$builder->addDefinition($this->prefix('helpers.crudReader'))
 				->setType(Helpers\CrudReader::class);
 		}
