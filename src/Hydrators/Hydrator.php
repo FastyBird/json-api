@@ -334,7 +334,7 @@ abstract class Hydrator
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
-				if (class_exists($className)) {
+				if (is_string($className) && class_exists($className)) {
 					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAnnotations, true)) {
@@ -361,7 +361,7 @@ abstract class Hydrator
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
-				if (class_exists($className)) {
+				if (is_string($className) && class_exists($className)) {
 					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 			} else {

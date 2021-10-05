@@ -27,7 +27,7 @@ contributteTranslation:
 	dirs: []
 
 contributteConsole:
-	name: FastyBird:WebServer!
+	name: FastyBird:JsonApi!
 	version: '1.0'
 	catchExceptions: true
 	autoExit: true
