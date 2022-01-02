@@ -775,16 +775,24 @@ abstract class Hydrator
 							!$parameter->isVariadic()
 							&& $attributes->has($this->getAttributeKey($parameter->getName()) ?? $parameter->getName())
 						) {
+							if (array_key_exists($parameter->getName(), $data)) {
+								continue;
+							}
+
 							// If there is a specific method for this attribute, we'll hydrate that
 							$value = $this->hasCustomHydrateAttribute($parameter->getName(), $attributes) ? $this->callHydrateAttribute($parameter->getName(), $attributes, $entity) : $attributes->get($this->getAttributeKey($parameter->getName()) ?? $parameter->getName());
 
 							$data[$parameter->getName()] = $value;
 
 						} elseif ($attributes->has($this->getAttributeKey((string) $num) ?? (string) $num)) {
+							if (array_key_exists((string) $num, $data)) {
+								continue;
+							}
+
 							// If there is a specific method for this attribute, we'll hydrate that
 							$value = $this->hasCustomHydrateAttribute((string) $num, $attributes) ? $this->callHydrateAttribute((string) $num, $attributes, $entity) : $attributes->get($this->getAttributeKey((string) $num) ?? (string) $num);
 
-							$data[$num] = $value;
+							$data[(string) $num] = $value;
 						}
 					}
 				}
@@ -840,7 +848,11 @@ abstract class Hydrator
 
 		$callable = [$this, $method];
 
-		return is_callable($callable);
+		if (is_callable($callable)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
