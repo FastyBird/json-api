@@ -848,11 +848,7 @@ abstract class Hydrator
 
 		$callable = [$this, $method];
 
-		if (is_callable($callable)) {
-			return true;
-		}
-
-		return false;
+		return is_callable($callable);
 	}
 
 	/**
