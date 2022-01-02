@@ -722,8 +722,7 @@ abstract class Hydrator
 			}
 
 			// If there is a specific method for this attribute, we'll hydrate that
-			$value = $this->callHydrateAttribute($field->getFieldName(), $attributes, $entity);
-			$value = $value ?? $field->getValue($attributes);
+			$value = $this->hasCustomHydrateAttribute($field->getFieldName(), $attributes) ? $this->callHydrateAttribute($field->getFieldName(), $attributes, $entity) : $field->getValue($attributes);
 
 			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
@@ -777,15 +776,13 @@ abstract class Hydrator
 							&& $attributes->has($this->getAttributeKey($parameter->getName()) ?? $parameter->getName())
 						) {
 							// If there is a specific method for this attribute, we'll hydrate that
-							$value = $this->callHydrateAttribute($parameter->getName(), $attributes, $entity);
-							$value = $value ?? $attributes->get($this->getAttributeKey($parameter->getName()) ?? $parameter->getName());
+							$value = $this->hasCustomHydrateAttribute($parameter->getName(), $attributes) ? $this->callHydrateAttribute($parameter->getName(), $attributes, $entity) : $attributes->get($this->getAttributeKey($parameter->getName()) ?? $parameter->getName());
 
 							$data[$parameter->getName()] = $value;
 
 						} elseif ($attributes->has($this->getAttributeKey((string) $num) ?? (string) $num)) {
 							// If there is a specific method for this attribute, we'll hydrate that
-							$value = $this->callHydrateAttribute((string) $num, $attributes, $entity);
-							$value = $value ?? $attributes->get($this->getAttributeKey((string) $num) ?? (string) $num);
+							$value = $this->hasCustomHydrateAttribute((string) $num, $attributes) ? $this->callHydrateAttribute((string) $num, $attributes, $entity) : $attributes->get($this->getAttributeKey((string) $num) ?? (string) $num);
 
 							$data[$num] = $value;
 						}
@@ -821,6 +818,33 @@ abstract class Hydrator
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Check if hydrator has custom attribute hydration method
+	 *
+	 * @param string $attributeKey
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 *
+	 * @return bool
+	 */
+	private function hasCustomHydrateAttribute(
+		string $attributeKey,
+		JsonAPIDocument\Objects\IStandardObject $attributes
+	): bool {
+		$method = $this->methodForAttribute($attributeKey);
+
+		if ($method === '' || !method_exists($this, $method)) {
+			return false;
+		}
+
+		$callable = [$this, $method];
+
+		if (is_callable($callable)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
