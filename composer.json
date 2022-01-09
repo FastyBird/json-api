@@ -8,8 +8,7 @@
     "libs",
     "library",
     "api",
-    "jsonapi",
-    "json:api"
+    "jsonapi"
   ],
 
   "homepage" : "https://www.fastybird.com",
