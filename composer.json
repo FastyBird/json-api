@@ -8,7 +8,8 @@
     "libs",
     "library",
     "api",
-    "jsonapi"
+    "jsonapi",
+    "json:api"
   ],
 
   "homepage" : "https://www.fastybird.com",
@@ -42,7 +43,7 @@
     "ext-json": "*",
     "consistence-community/consistence": "^2.1",
     "doctrine/orm": "^2.6",
-    "fastybird/web-server": "^0.4",
+    "fastybird/web-server": "^0.5",
     "ipub/json-api-document": "^0.2",
     "neomerx/json-api": "^4.0",
     "nette/bootstrap": "^3.1",

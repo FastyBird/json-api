@@ -15,8 +15,6 @@ php:
 
 extensions:
 	contributteTranslation	: Contributte\Translation\DI\TranslationExtension
-	contributteEvents		: Contributte\EventDispatcher\DI\EventDispatcherExtension
-	contributteConsole		: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
 	fbSocketServerFactory	: FastyBird\SocketServerFactory\DI\SocketServerFactoryExtension
 	fbWebServer				: FastyBird\WebServer\DI\WebServerExtension(%consoleMode%)
 
@@ -26,13 +24,3 @@ contributteTranslation:
 		fallback: [en_US, en]
 	localeResolvers: []
 	dirs: []
-
-contributteConsole:
-	name: FastyBird:JsonApi!
-	version: '1.0'
-	catchExceptions: true
-	autoExit: true
-	url: http://example.com
-	lazy: false
-	helperSet: \Symfony\Component\Console\Helper\HelperSet
-	helpers: []
