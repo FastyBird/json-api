@@ -19,13 +19,19 @@
     {
       "name" : "FastyBird s.r.o.",
       "email" : "code@fastybird.com",
-      "homepage" : "https://www.fastybird.com/"
+      "homepage" : "https://www.fastybird.com"
     },
     {
       "name" : "Adam Kadlec",
       "email" : "adam.kadlec@fastybird.com"
     }
   ],
+
+  "support": {
+    "email": "code@fastybird.com",
+    "issues": "https://github.com/FastyBird/json-api/issues",
+    "source" : "https://github.com/FastyBird/json-api"
+  },
 
   "prefer-stable" : true,
 
@@ -35,7 +41,7 @@
     "php": ">=7.4.0|>=8.0.0",
     "ext-json": "*",
     "consistence-community/consistence": "^2.1",
-    "contributte/translation": "^0.8",
+    "contributte/translation": "^0.9",
     "doctrine/orm": "^2.6",
     "fastybird/web-server": "^0.4",
     "ipub/json-api-document": "^0.2",
