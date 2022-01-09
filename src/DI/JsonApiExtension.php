@@ -15,7 +15,6 @@
 
 namespace FastyBird\JsonApi\DI;
 
-use Contributte\Translation;
 use FastyBird\JsonApi\Helpers;
 use FastyBird\JsonApi\JsonApi;
 use FastyBird\JsonApi\Middleware;
@@ -33,7 +32,7 @@ use stdClass;
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\TranslationProviderInterface
+class JsonApiExtension extends DI\CompilerExtension
 {
 
 	/**
@@ -125,16 +124,6 @@ class JsonApiExtension extends DI\CompilerExtension implements Translation\DI\Tr
 				$schemaContainerService->addSetup('add', [$schemasService]);
 			}
 		}
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public function getTranslationResources(): array
-	{
-		return [
-			__DIR__ . '/../Translations',
-		];
 	}
 
 }

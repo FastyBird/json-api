@@ -41,7 +41,6 @@
     "php": ">=7.4.0|>=8.0.0",
     "ext-json": "*",
     "consistence-community/consistence": "^2.1",
-    "contributte/translation": "^0.9",
     "doctrine/orm": "^2.6",
     "fastybird/web-server": "^0.4",
     "ipub/json-api-document": "^0.2",
@@ -55,6 +54,7 @@
   },
 
   "require-dev" : {
+    "contributte/translation": "^0.9",
     "mockery/mockery" : "^1.4",
     "ninjify/nunjuck" : "^0.3",
     "ninjify/qa" : "^0.12",

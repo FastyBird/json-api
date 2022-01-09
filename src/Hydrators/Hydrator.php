@@ -17,7 +17,6 @@ namespace FastyBird\JsonApi\Hydrators;
 
 use ArrayAccess;
 use Consistence;
-use Contributte\Translation;
 use DateTimeInterface;
 use Doctrine\Common;
 use Doctrine\ORM;
@@ -28,6 +27,7 @@ use FastyBird\JsonApi\Hydrators;
 use Fig\Http\Message\StatusCodeInterface;
 use IPub\JsonAPIDocument;
 use Nette;
+use Nette\Localization;
 use Nette\Utils;
 use phpDocumentor;
 use Ramsey\Uuid;
@@ -106,8 +106,8 @@ abstract class Hydrator
 	 */
 	protected array $relationships = [];
 
-	/** @var Translation\PrefixedTranslator */
-	protected Translation\PrefixedTranslator $translator;
+	/** @var Localization\Translator */
+	protected Localization\Translator $translator;
 
 	/** @var string */
 	protected string $translationDomain = '';
@@ -135,7 +135,7 @@ abstract class Hydrator
 
 	public function __construct(
 		Persistence\ManagerRegistry $managerRegistry,
-		Translation\Translator $translator,
+		Localization\Translator $translator,
 		?Helpers\CrudReader $crudReader = null,
 		?Common\Cache\Cache $cache = null
 	) {
@@ -154,7 +154,7 @@ abstract class Hydrator
 		$this->errors = new Exceptions\JsonApiMultipleErrorException();
 
 		$this->crudReader = $crudReader;
-		$this->translator = new Translation\PrefixedTranslator($translator, $this->translationDomain);
+		$this->translator = $translator;
 	}
 
 	/**
