@@ -18,19 +18,6 @@ extensions:
     fbJsonApi: FastyBird\JsonApi\DI\JsonApiExtension
 ```
 
-This extension is dependent on other extensions, and they have to be registered too
-
-```neon
-extensions:
-    ....
-    fbWebServer: FastyBird\WebServer\DI\WebServerExtension
-    contributteTranslation: Contributte\Translation\DI\TranslationExtension
-    contributteEvents: Contributte\EventDispatcher\DI\EventDispatcherExtension
-    contributteConsole: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
-```
-
-> For information how to configure these extensions please visit their doc pages
-
 ## Configuration
 
 This extension has some configuration options:

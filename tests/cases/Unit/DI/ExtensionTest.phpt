@@ -2,6 +2,7 @@
 
 namespace Tests\Cases;
 
+use FastyBird\JsonApi\Builder;
 use FastyBird\JsonApi\DI;
 use FastyBird\JsonApi\JsonApi;
 use FastyBird\JsonApi\Middleware;
@@ -20,6 +21,8 @@ final class ExtensionTest extends BaseTestCase
 	public function testCompilersServices(): void
 	{
 		$container = $this->createContainer();
+
+		Assert::notNull($container->getByType(Builder\Builder::class));
 
 		Assert::notNull($container->getByType(Middleware\JsonApiMiddleware::class));
 

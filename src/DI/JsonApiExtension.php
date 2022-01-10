@@ -15,6 +15,7 @@
 
 namespace FastyBird\JsonApi\DI;
 
+use FastyBird\JsonApi\Builder;
 use FastyBird\JsonApi\Helpers;
 use FastyBird\JsonApi\JsonApi;
 use FastyBird\JsonApi\Middleware;
@@ -82,10 +83,13 @@ class JsonApiExtension extends DI\CompilerExtension
 		/** @var stdClass $configuration */
 		$configuration = $this->getConfig();
 
+		$builder->addDefinition($this->prefix('builder'), new DI\Definitions\ServiceDefinition())
+			->setType(Builder\Builder::class)
+			->setArgument('metaAuthor', $configuration->meta->author)
+			->setArgument('metaCopyright', $configuration->meta->copyright);
+
 		$builder->addDefinition($this->prefix('middlewares.jsonapi'), new DI\Definitions\ServiceDefinition())
 			->setType(Middleware\JsonApiMiddleware::class)
-			->setArgument('metaAuthor', $configuration->meta->author)
-			->setArgument('metaCopyright', $configuration->meta->copyright)
 			->setTags([
 				'middleware' => [
 					'priority' => $configuration->middleware->priority,
