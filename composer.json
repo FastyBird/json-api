@@ -41,6 +41,7 @@
     "php": ">=7.4.0|>=8.0.0",
     "ext-json": "*",
     "consistence-community/consistence": "^2.1",
+    "doctrine/annotations": "^1.13",
     "doctrine/orm": "^2.6",
     "fastybird/web-server": "^0.5",
     "ipub/json-api-document": "^0.2",
