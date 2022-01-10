@@ -16,7 +16,7 @@ hydrator and schema factory.
 
 ### Features:
 
-- [PSR-7](http://www.php-fig.org/psr/psr-7/) middleware for transforming response to [{JSON:API}](https://jsonapi.org/)
+- [PSR-7](http://www.php-fig.org/psr/psr-7/) middleware for handling exceptions to [{JSON:API}](https://jsonapi.org/)
   v1.1 response
 - [Doctrine2](https://www.doctrine-project.org) data hydration from [{JSON:API}](https://jsonapi.org/) documents
 - [{JSON:API}](https://jsonapi.org/) schemas for building valid responses
