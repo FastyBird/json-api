@@ -12,16 +12,3 @@
 
 php:
     date.timezone: Europe/Prague
-
-extensions:
-    contributteTranslation  : Contributte\Translation\DI\TranslationExtension
-    fbSocketServerFactory   : FastyBird\SocketServerFactory\DI\SocketServerFactoryExtension
-    fbWebServer             : FastyBird\WebServer\DI\WebServerExtension(%consoleMode%)
-
-contributteTranslation:
-    locales:
-        default: en_US
-        fallback: [en_US, en]
-    localeResolvers: []
-    dirs:
-        - %appDir%/../src/Translations
