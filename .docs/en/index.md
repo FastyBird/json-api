@@ -51,7 +51,8 @@ Where:
 ## Entity hydrator
 
 Entity hydrator is useful service which purpose is to transform incoming [{JSON:API}](https://jsonapi.org/) request into
-[Doctrine2](https://www.doctrine-project.org) entity. All what you have to do is to define which attributes & relations could be hydrated.
+[Doctrine2](https://www.doctrine-project.org) entity. All what you have to do is to define which attributes & relations
+could be hydrated.
 
 ```php
 namespace Your\CoolApplication\Data;
@@ -299,7 +300,8 @@ Nette\Utils\ArrayHash::from([
 ]);
 ```
 
-Value of relation attribute could be instance of some entity, array of entity instancies or an plain key-value array extracted from **included**
+Value of relation attribute could be instance of some entity, array of entity instancies or an plain key-value array
+extracted from **included**
 
 All entity hydrators should be registered as services:
 
@@ -310,7 +312,8 @@ services:
 
 ## Entity schema
 
-Entity schema is useful service which purpose is to transform [Doctrine2](https://www.doctrine-project.org) entity into [{JSON:API}](https://jsonapi.org/) document.
+Entity schema is useful service which purpose is to transform [Doctrine2](https://www.doctrine-project.org) entity
+into [{JSON:API}](https://jsonapi.org/) document.
 
 ```php
 namespace Your\CoolApplication\Data;
@@ -454,7 +457,9 @@ And this extension wil find it automatically and register them to response encod
 
 # Tip
 
-For better results for hydrator you could use [ipub/doctrine-crud](https://github.com/ipublikuj/doctrine-crud) package. This packages has special annotation for entity atributes and with this annotation you could define which field is required for new entity or which field is writable:
+For better results for hydrator you could use [ipub/doctrine-crud](https://github.com/ipublikuj/doctrine-crud) package.
+This packages has special annotation for entity atributes and with this annotation you could define which field is
+required for new entity or which field is writable:
 
 ```php
 namespace Your\CoolApplication\Data;
@@ -483,10 +488,12 @@ class ArticleEntity
 }
 ```
 
-As you can see, **title** attribute is required and have to be present during hydration, but will be skipped when in hydration call is used existing entity.
-And **content** attribute is also writable, so is hydrated when new entity is created and also when entity is updated.
+As you can see, **title** attribute is required and have to be present during hydration, but will be skipped when in
+hydration call is used existing entity. And **content** attribute is also writable, so is hydrated when new entity is
+created and also when entity is updated.
 
 With this package you could use one hydrator service for both states - creating entity and updating entity.
 
 ***
-Homepage [https://www.fastybird.com](https://www.fastybird.com) and repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).
+Homepage [https://www.fastybird.com](https://www.fastybird.com) and
+repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).

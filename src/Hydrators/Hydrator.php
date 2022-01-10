@@ -562,7 +562,9 @@ abstract class Hydrator
 	{
 		$this->normalizeRelationships();
 
-		return $this->normalizedRelationships[$entityKey] ?? null;
+		$key = $this->normalizedRelationships[$entityKey] ?? null;
+
+		return is_string($key) ? $key : null;
 	}
 
 	/**
@@ -596,7 +598,9 @@ abstract class Hydrator
 	{
 		$this->normalizeAttributes();
 
-		return $this->normalizedAttributes[$entityKey] ?? null;
+		$key = $this->normalizedAttributes[$entityKey] ?? null;
+
+		return is_string($key) ? $key : null;
 	}
 
 	/**
@@ -630,7 +634,9 @@ abstract class Hydrator
 	{
 		$this->normalizeCompositeAttributes();
 
-		return $this->normalizedCompositedAttributes[$entityKey] ?? null;
+		$key = $this->normalizedCompositedAttributes[$entityKey] ?? null;
+
+		return is_string($key) ? $key : null;
 	}
 
 	/**
@@ -751,7 +757,11 @@ abstract class Hydrator
 							$field->getMappedName()
 						);
 
-						if (!isset($data[$field->getFieldName()]['entity'])) {
+						if (
+							isset($data[$field->getFieldName()])
+							&& is_array($data[$field->getFieldName()])
+							&& !isset($data[$field->getFieldName()]['entity'])
+						) {
 							$data[$field->getFieldName()]['entity'] = $fieldClassName;
 						}
 					} elseif ($value !== null || $field->isNullable()) {
@@ -852,6 +862,35 @@ abstract class Hydrator
 	}
 
 	/**
+	 * Return the method name to call for hydrating the specific attribute.
+	 *
+	 * If this method returns an empty value, or a value that is not callable, hydration
+	 * of the the relationship will be skipped
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	private function methodForAttribute(string $key): string
+	{
+		return sprintf('hydrate%sAttribute', $this->classify($key));
+	}
+
+	/**
+	 * Gets the upper camel case form of a string.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	private function classify(string $value): string
+	{
+		$converted = ucwords(str_replace(['-', '_'], ' ', $value));
+
+		return str_replace(' ', '', $converted);
+	}
+
+	/**
 	 * Hydrate a attribute by invoking a method on this hydrator.
 	 *
 	 * @param string $attributeKey
@@ -880,35 +919,6 @@ abstract class Hydrator
 		}
 
 		return null;
-	}
-
-	/**
-	 * Return the method name to call for hydrating the specific attribute.
-	 *
-	 * If this method returns an empty value, or a value that is not callable, hydration
-	 * of the the relationship will be skipped
-	 *
-	 * @param string $key
-	 *
-	 * @return string
-	 */
-	private function methodForAttribute(string $key): string
-	{
-		return sprintf('hydrate%sAttribute', $this->classify($key));
-	}
-
-	/**
-	 * Gets the upper camel case form of a string.
-	 *
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	private function classify(string $value): string
-	{
-		$converted = ucwords(str_replace(['-', '_'], ' ', $value));
-
-		return str_replace(' ', '', $converted);
 	}
 
 	/**

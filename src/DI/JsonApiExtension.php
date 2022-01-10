@@ -59,14 +59,16 @@ class JsonApiExtension extends DI\CompilerExtension
 	public function getConfigSchema(): Schema\Schema
 	{
 		return Schema\Expect::structure([
-			'meta' => Schema\Expect::structure([
+			'meta'       => Schema\Expect::structure([
 				'author'    => Schema\Expect::anyOf(Schema\Expect::string(), Schema\Expect::array())
 					->default('FastyBird team'),
 				'copyright' => Schema\Expect::string()
-					->default(null)->nullable(),
+					->default(null)
+					->nullable(),
 			]),
 			'middleware' => Schema\Expect::structure([
-				'priority' => Schema\Expect::int()->default(100),
+				'priority' => Schema\Expect::int()
+					->default(100),
 			]),
 		]);
 	}

@@ -178,17 +178,21 @@ class JsonApiMiddleware implements MiddlewareInterface
 
 					$encoder->withLinks($links);
 
-					if (Utils\Strings::contains($request->getUri()->getPath(), '/relationships/')) {
-						$encodedData = $encoder->encodeDataAsArray($entity->getData());
+					$entityData = $entity->getData();
+
+					if (Utils\Strings::contains($request->getUri()
+						->getPath(), '/relationships/')) {
+						$encodedData = $encoder->encodeDataAsArray($entityData); // @phpstan-ignore-line
 
 						// Try to get "self" link from encoded entity as array
 						if (
 							isset($encodedData['data'])
-							&& isset($encodedData['data']['links'])
-							&& isset($encodedData['data']['links'][self::LINK_SELF])
+							&& isset($encodedData['data']['links']) // @phpstan-ignore-line
+							&& isset($encodedData['data']['links'][self::LINK_SELF]) // @phpstan-ignore-line
 						) {
 							$encoder->withLinks(array_merge($links, [
-								self::LINK_RELATED => new Schema\Link(false, $encodedData['data']['links'][self::LINK_SELF], false),
+								// @phpstan-ignore-next-line
+								self::LINK_RELATED => new Schema\Link(false, strval($encodedData['data']['links'][self::LINK_SELF]), false),
 							]));
 
 						} else {
@@ -209,14 +213,14 @@ class JsonApiMiddleware implements MiddlewareInterface
 							}
 						}
 
-						$content = $encoder->encodeIdentifiers($entity->getData());
+						$content = $encoder->encodeIdentifiers($entityData); // @phpstan-ignore-line
 
 					} else {
 						if (array_key_exists('include', $request->getQueryParams())) {
 							$encoder->withIncludedPaths(explode(',', $request->getQueryParams()['include']));
 						}
 
-						$content = $encoder->encodeData($entity->getData());
+						$content = $encoder->encodeData($entityData); // @phpstan-ignore-line
 					}
 
 					$response->getBody()

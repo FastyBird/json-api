@@ -11,11 +11,13 @@
 
 ## What is FastyBird {JSON:API} library?
 
-This is a [Nette framework](https://nette.org) extension which is implementing [{JSON:API}](https://jsonapi.org/) hydrator and schema factory.
+This is a [Nette framework](https://nette.org) extension which is implementing [{JSON:API}](https://jsonapi.org/)
+hydrator and schema factory.
 
 ### Features:
 
-- [PSR-7](http://www.php-fig.org/psr/psr-7/) middleware for transforming response to [{JSON:API}](https://jsonapi.org/) v1.1 response
+- [PSR-7](http://www.php-fig.org/psr/psr-7/) middleware for transforming response to [{JSON:API}](https://jsonapi.org/)
+  v1.1 response
 - [Doctrine2](https://www.doctrine-project.org) data hydration from [{JSON:API}](https://jsonapi.org/) documents
 - [{JSON:API}](https://jsonapi.org/) schemas for building valid responses
 
@@ -29,7 +31,9 @@ composer require fastybird/json-api
 
 ## Documentation
 
-Learn how to use {JSON:API} data hydrators & document builders in [documentation](https://github.com/FastyBird/json-api/blob/master/.docs/en/index.md).
+Learn how to use {JSON:API} data hydrators & document builders
+in [documentation](https://github.com/FastyBird/json-api/blob/master/.docs/en/index.md).
 
 ***
-Homepage [https://www.fastybird.com](https://www.fastybird.com) and repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).
+Homepage [https://www.fastybird.com](https://www.fastybird.com) and
+repository [https://github.com/FastyBird/json-api](https://github.com/FastyBird/json-api).

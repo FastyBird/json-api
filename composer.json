@@ -1,7 +1,7 @@
 {
   "name" : "fastybird/json-api",
   "type" : "library",
-  "description" : "FastyBird {JSON:API} api tools with data hydration",
+  "description" : "{JSON:API} api tools with data hydration",
   "keywords" : [
     "fastybird",
     "fb",
@@ -27,9 +27,9 @@
     }
   ],
 
-  "support": {
-    "email": "code@fastybird.com",
-    "issues": "https://github.com/FastyBird/json-api/issues",
+  "support" : {
+    "email" : "code@fastybird.com",
+    "issues" : "https://github.com/FastyBird/json-api/issues",
     "source" : "https://github.com/FastyBird/json-api"
   },
 
@@ -38,39 +38,40 @@
   "minimum-stability" : "stable",
 
   "require" : {
-    "php": ">=7.4.0|>=8.0.0",
-    "ext-json": "*",
-    "consistence-community/consistence": "^2.1",
-    "doctrine/annotations": "^1.13",
-    "doctrine/orm": "^2.6",
-    "fastybird/web-server": "^0.5",
-    "ipub/json-api-document": "^0.2",
-    "neomerx/json-api": "^4.0",
-    "nette/bootstrap": "^3.1",
-    "nette/di": "^3.0",
-    "nette/utils": "^3.2",
-    "phpdocumentor/reflection-docblock": "^5.2",
-    "psr/log": "^1.1",
-    "ramsey/uuid": "^4.1"
+    "php" : ">=7.4.0|>=8.0.0",
+    "ext-json" : "*",
+    "consistence-community/consistence" : "^2.1",
+    "cweagans/composer-patches" : "^1.7",
+    "doctrine/annotations" : "^1.13",
+    "doctrine/orm" : "^2.6",
+    "fastybird/web-server" : "^0.6",
+    "ipub/json-api-document" : "^0.2",
+    "neomerx/json-api" : "^4.0",
+    "nette/bootstrap" : "^3.1",
+    "nette/di" : "^3.0",
+    "nette/utils" : "^3.2",
+    "phpdocumentor/reflection-docblock" : "^5.3",
+    "psr/log" : "^1.1|^3.0",
+    "ramsey/uuid" : "^4.2"
   },
 
   "require-dev" : {
-    "contributte/translation": "^0.9",
+    "contributte/translation" : "^0.9",
     "mockery/mockery" : "^1.4",
     "ninjify/nunjuck" : "^0.3",
-    "ninjify/qa" : "^0.12",
-    "pds/skeleton" : "~1.0",
+    "ninjify/qa" : "^0.13",
+    "pds/skeleton" : "^1.0",
     "phpstan/extension-installer" : "^1.1",
-    "phpstan/phpstan" : "^0.12",
-    "phpstan/phpstan-deprecation-rules" : "^0.12",
-    "phpstan/phpstan-doctrine" : "^0.12",
-    "phpstan/phpstan-nette" : "^0.12",
-    "phpstan/phpstan-strict-rules" : "^0.12",
-    "tracy/tracy" : "^2.8"
+    "phpstan/phpstan" : "^1.3",
+    "phpstan/phpstan-deprecation-rules" : "^1.0",
+    "phpstan/phpstan-doctrine" : "^1.0",
+    "phpstan/phpstan-nette" : "^1.0",
+    "phpstan/phpstan-strict-rules" : "^1.1",
+    "tracy/tracy" : "^2.9"
   },
 
-  "suggest": {
-    "ipub/doctrine-crud": "Allows more advanced entity configuration with annotation props for required|writable props"
+  "suggest" : {
+    "ipub/doctrine-crud" : "Allows more advanced entity configuration with annotation props for required|writable props"
   },
 
   "autoload" : {
@@ -88,5 +89,13 @@
 
   "config" : {
     "sort-packages" : true
+  },
+
+  "extra" : {
+    "patches" : {
+      "nette/utils" : {
+        "Bug: Offset check with null support" : "patches/nette.array.offsetCheck.diff"
+      }
+    }
   }
 }

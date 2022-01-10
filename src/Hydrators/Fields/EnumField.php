@@ -61,7 +61,9 @@ final class EnumField extends Field
 		$callable = [$this->typeClass, 'get'];
 
 		if (is_callable($callable)) {
-			return $value !== null ? call_user_func($callable, $value) : null;
+			$result = $value !== null ? call_user_func($callable, $value) : null;
+
+			return $result instanceof Consistence\Enum\Enum ? $result : null;
 		}
 
 		return null;
