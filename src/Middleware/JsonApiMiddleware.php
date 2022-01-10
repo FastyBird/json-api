@@ -22,12 +22,9 @@ use Neomerx;
 use Neomerx\JsonApi\Contracts;
 use Neomerx\JsonApi\Schema;
 use Nette\DI;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message;
+use Psr\Http\Server;
 use Psr\Log;
-use Sunrise\Http\Message;
 use Throwable;
 
 /**
@@ -38,8 +35,11 @@ use Throwable;
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-class JsonApiMiddleware implements MiddlewareInterface
+class JsonApiMiddleware implements Server\MiddlewareInterface
 {
+
+	/** @var Message\ResponseFactoryInterface */
+	private Message\ResponseFactoryInterface $responseFactory;
 
 	/** @var Log\LoggerInterface */
 	private Log\LoggerInterface $logger;
@@ -48,30 +48,33 @@ class JsonApiMiddleware implements MiddlewareInterface
 	private DI\Container $container;
 
 	/**
+	 * @param Message\ResponseFactoryInterface $responseFactory
 	 * @param DI\Container $container
 	 * @param Log\LoggerInterface|null $logger
 	 */
 	public function __construct(
+		Message\ResponseFactoryInterface $responseFactory,
 		DI\Container $container,
 		?Log\LoggerInterface $logger = null
 	) {
+		$this->responseFactory = $responseFactory;
 		$this->logger = $logger ?? new Log\NullLogger();
 		$this->container = $container;
 	}
 
 	/**
-	 * @param ServerRequestInterface $request
-	 * @param RequestHandlerInterface $handler
+	 * @param Message\ServerRequestInterface $request
+	 * @param Server\RequestHandlerInterface $handler
 	 *
-	 * @return ResponseInterface
+	 * @return Message\ResponseInterface
 	 */
-	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+	public function process(Message\ServerRequestInterface $request, Server\RequestHandlerInterface $handler): Message\ResponseInterface
 	{
 		try {
 			return $handler->handle($request);
 
 		} catch (Throwable $ex) {
-			$response = (new Message\ResponseFactory())->createResponse(StatusCodeInterface::STATUS_BAD_REQUEST);
+			$response = $this->responseFactory->createResponse(StatusCodeInterface::STATUS_BAD_REQUEST);
 
 			if ($ex instanceof Exceptions\IJsonApiException) {
 				$response = $response->withStatus($ex->getCode());
@@ -80,14 +83,12 @@ class JsonApiMiddleware implements MiddlewareInterface
 					$content = $this->getEncoder()
 						->encodeError($ex->getError());
 
-					$response->getBody()
-						->write($content);
+					$response->getBody()->write($content);
 				} elseif ($ex instanceof Exceptions\JsonApiMultipleErrorException) {
 					$content = $this->getEncoder()
 						->encodeErrors($ex->getErrors());
 
-					$response->getBody()
-						->write($content);
+					$response->getBody()->write($content);
 				}
 			} else {
 				$this->logger->error('[FB::JSON_API] An error occurred during request handling', [
@@ -110,8 +111,7 @@ class JsonApiMiddleware implements MiddlewareInterface
 						'There was an server error, please try again later'
 					));
 
-				$response->getBody()
-					->write($content);
+				$response->getBody()->write($content);
 			}
 		}
 

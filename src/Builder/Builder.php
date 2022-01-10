@@ -24,7 +24,6 @@ use Nette\Utils;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
-use Sunrise\Stream;
 
 /**
  * {JSON:API} formatting output handling middleware
@@ -190,10 +189,12 @@ class Builder
 			$content = $encoder->encodeData($entity);
 		}
 
-		$response = $response
-			->withBody((new Stream\StreamFactory())->createStream($content));
+		$response->getBody()->write($content);
 
-		return $response;
+		// Setup content type
+		return $response
+			// Content headers
+			->withHeader('Content-Type', Contracts\Http\Headers\MediaTypeInterface::JSON_API_MEDIA_TYPE);
 	}
 
 	/**
