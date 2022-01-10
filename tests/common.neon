@@ -12,3 +12,7 @@
 
 php:
     date.timezone: Europe/Prague
+
+extensions:
+    fbSocketServerFactory   : FastyBird\SocketServerFactory\DI\SocketServerFactoryExtension
+    fbWebServer             : FastyBird\WebServer\DI\WebServerExtension(%consoleMode%)
