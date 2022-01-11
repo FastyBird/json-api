@@ -17,6 +17,7 @@ namespace FastyBird\JsonApi\Hydrators;
 
 use FastyBird\JsonApi\JsonApi;
 use IPub\JsonAPIDocument;
+use Nette\DI;
 use SplObjectStorage;
 
 /**
@@ -31,13 +32,16 @@ class HydratorsContainer
 	/** @var SplObjectStorage<Hydrator, null> */
 	private SplObjectStorage $hydrators;
 
-	/** @var JsonApi\JsonApiSchemaContainer */
-	private JsonApi\JsonApiSchemaContainer $jsonApiSchemaContainer;
+	/** @var DI\Container */
+	private DI\Container $container;
+
+	/** @var JsonApi\JsonApiSchemaContainer|null */
+	private ?JsonApi\JsonApiSchemaContainer $jsonApiSchemaContainer = null;
 
 	public function __construct(
-		JsonApi\JsonApiSchemaContainer $jsonApiSchemaContainer
+		DI\Container $container
 	) {
-		$this->jsonApiSchemaContainer = $jsonApiSchemaContainer;
+		$this->container = $container;
 
 		$this->hydrators = new SplObjectStorage();
 	}
@@ -54,7 +58,7 @@ class HydratorsContainer
 		$this->hydrators->rewind();
 
 		foreach ($this->hydrators as $hydrator) {
-			$schema = $this->jsonApiSchemaContainer->getSchemaByClassName($hydrator->getEntityName());
+			$schema = $this->getSchemaContainer()->getSchemaByClassName($hydrator->getEntityName());
 
 			if ($schema->getType() === $document->getResource()->getType()) {
 				return $hydrator;
@@ -76,6 +80,20 @@ class HydratorsContainer
 		if (!$this->hydrators->contains($hydrator)) {
 			$this->hydrators->attach($hydrator);
 		}
+	}
+
+	/**
+	 * @return JsonApi\JsonApiSchemaContainer
+	 */
+	private function getSchemaContainer(): JsonApi\JsonApiSchemaContainer
+	{
+		if ($this->jsonApiSchemaContainer !== null) {
+			return $this->jsonApiSchemaContainer;
+		}
+
+		$this->jsonApiSchemaContainer = $this->container->getByType(JsonApi\JsonApiSchemaContainer::class);
+
+		return $this->jsonApiSchemaContainer;
 	}
 
 }
