@@ -169,7 +169,7 @@ class Builder
 
 					$linkRelated = str_replace('/relationships/', '/', $this->uriToString($uriRelated));
 
-					$isValid = call_user_func($linkValidator, [$linkRelated]);
+					$isValid = call_user_func_array($linkValidator, [$linkRelated]);
 
 					if ($isValid === true) {
 						$encoder->withLinks(array_merge($links, [
