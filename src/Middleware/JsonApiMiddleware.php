@@ -18,6 +18,7 @@ namespace FastyBird\JsonApi\Middleware;
 use FastyBird\JsonApi\Exceptions;
 use FastyBird\JsonApi\JsonApi;
 use Fig\Http\Message\StatusCodeInterface;
+use IPub;
 use Neomerx;
 use Neomerx\JsonApi\Contracts;
 use Neomerx\JsonApi\Schema;
@@ -26,6 +27,10 @@ use Psr\Http\Message;
 use Psr\Http\Server;
 use Psr\Log;
 use Throwable;
+
+if (!class_exists('IPub\SlimRouter\Exceptions\HttpException')) {
+	class_alias('IPub\SlimRouter\Exceptions\HttpException', Throwable::class);
+}
 
 /**
  * {JSON:API} formatting output handling middleware
@@ -74,6 +79,7 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 			return $handler->handle($request);
 
 		} catch (Throwable $ex) {
+			var_dump($ex->getMessage());
 			$response = $this->responseFactory->createResponse(StatusCodeInterface::STATUS_BAD_REQUEST);
 
 			if ($ex instanceof Exceptions\IJsonApiException) {
@@ -90,6 +96,22 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 
 					$response->getBody()->write($content);
 				}
+			} elseif ($ex instanceof IPub\SlimRouter\Exceptions\HttpException) {
+				$response = $response->withStatus($ex->getCode());
+
+				$content = $this->getEncoder()
+					->encodeError(new Schema\Error(
+						null,
+						null,
+						null,
+						(string) $ex->getCode(),
+						(string) $ex->getCode(),
+						$ex->getTitle(),
+						$ex->getDescription()
+					));
+
+				$response->getBody()
+					->write($content);
 			} else {
 				$this->logger->error('[FB::JSON_API] An error occurred during request handling', [
 					'exception' => [
