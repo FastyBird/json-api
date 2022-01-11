@@ -79,7 +79,6 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 			return $handler->handle($request);
 
 		} catch (Throwable $ex) {
-			var_dump($ex->getMessage());
 			$response = $this->responseFactory->createResponse(StatusCodeInterface::STATUS_BAD_REQUEST);
 
 			if ($ex instanceof Exceptions\IJsonApiException) {
