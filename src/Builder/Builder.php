@@ -71,7 +71,7 @@ class Builder
 	/**
 	 * @param ServerRequestInterface $request
 	 * @param ResponseInterface $response
-	 * @param object|Array<object> $entity
+	 * @param object|Array<object>|null $entity
 	 * @param int|null $totalCount
 	 *
 	 * @return ResponseInterface

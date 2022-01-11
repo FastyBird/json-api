@@ -109,9 +109,6 @@ abstract class Hydrator
 	/** @var Localization\Translator */
 	protected Localization\Translator $translator;
 
-	/** @var string */
-	protected string $translationDomain = '';
-
 	/** @var mixed[]|null */
 	private ?array $normalizedAttributes = null;
 
