@@ -15,6 +15,7 @@
 
 namespace FastyBird\JsonApi\JsonApi;
 
+use FastyBird\JsonApi\Exceptions;
 use FastyBird\JsonApi\Schemas;
 use Neomerx\JsonApi;
 
@@ -50,6 +51,22 @@ class JsonApiSchemaContainer extends JsonApi\Schema\SchemaContainer
 		$this->setProviderMapping($schema->getEntityClass(), get_class($schema));
 		$this->setResourceToJsonTypeMapping($schema->getType(), $schema->getEntityClass());
 		$this->setCreatedProvider($schema->getEntityClass(), $schema);
+	}
+
+	/**
+	 * @param string $resourceType
+	 *
+	 * @return Schemas\IJsonApiSchema
+	 */
+	public function getSchemaByClassName(string $resourceType): Schemas\IJsonApiSchema
+	{
+		$schema = $this->getSchemaByType($resourceType);
+
+		if ($schema instanceof Schemas\IJsonApiSchema) {
+			return $schema;
+		}
+
+		throw new Exceptions\InvalidStateException('');
 	}
 
 	/**

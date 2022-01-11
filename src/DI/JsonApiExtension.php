@@ -17,6 +17,7 @@ namespace FastyBird\JsonApi\DI;
 
 use FastyBird\JsonApi\Builder;
 use FastyBird\JsonApi\Helpers;
+use FastyBird\JsonApi\Hydrators;
 use FastyBird\JsonApi\JsonApi;
 use FastyBird\JsonApi\Middleware;
 use FastyBird\JsonApi\Schemas;
@@ -96,6 +97,9 @@ class JsonApiExtension extends DI\CompilerExtension
 				],
 			]);
 
+		$builder->addDefinition($this->prefix('hydrators.container'), new DI\Definitions\ServiceDefinition())
+			->setType(Hydrators\HydratorsContainer::class);
+
 		$builder->addDefinition($this->prefix('schemas.container'), new DI\Definitions\ServiceDefinition())
 			->setType(JsonApi\JsonApiSchemaContainer::class);
 
@@ -128,6 +132,23 @@ class JsonApiExtension extends DI\CompilerExtension
 
 			foreach ($schemasServices as $schemasService) {
 				$schemaContainerService->addSetup('add', [$schemasService]);
+			}
+		}
+
+		/**
+		 * JSON:API HYDRATORS
+		 */
+
+		$hydratorContainerServiceName = $builder->getByType(Hydrators\HydratorsContainer::class, true);
+
+		if ($hydratorContainerServiceName !== null) {
+			$hydratorContainerService = $builder->getDefinition($hydratorContainerServiceName);
+			assert($hydratorContainerService instanceof DI\Definitions\ServiceDefinition);
+
+			$hydratorsServices = $builder->findByType(Hydrators\Hydrator::class);
+
+			foreach ($hydratorsServices as $hydratorService) {
+				$hydratorContainerService->addSetup('add', [$hydratorService]);
 			}
 		}
 	}

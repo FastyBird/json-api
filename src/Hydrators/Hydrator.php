@@ -242,6 +242,13 @@ abstract class Hydrator
 	}
 
 	/**
+	 * @return string
+	 *
+	 * @phpstan-return class-string
+	 */
+	abstract public function getEntityName(): string;
+
+	/**
 	 * @param string $entityClassName
 	 *
 	 * @return Hydrators\Fields\IField[]
@@ -684,13 +691,6 @@ abstract class Hydrator
 
 		return null;
 	}
-
-	/**
-	 * @return string
-	 *
-	 * @phpstan-return class-string
-	 */
-	abstract protected function getEntityName(): string;
 
 	/**
 	 * @param string $className
