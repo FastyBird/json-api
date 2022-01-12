@@ -73,8 +73,10 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 	 *
 	 * @return Message\ResponseInterface
 	 */
-	public function process(Message\ServerRequestInterface $request, Server\RequestHandlerInterface $handler): Message\ResponseInterface
-	{
+	public function process(
+		Message\ServerRequestInterface $request,
+		Server\RequestHandlerInterface $handler
+	): Message\ResponseInterface {
 		try {
 			return $handler->handle($request);
 
@@ -88,12 +90,14 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 					$content = $this->getEncoder()
 						->encodeError($ex->getError());
 
-					$response->getBody()->write($content);
+					$response->getBody()
+						->write($content);
 				} elseif ($ex instanceof Exceptions\JsonApiMultipleErrorException) {
 					$content = $this->getEncoder()
 						->encodeErrors($ex->getErrors());
 
-					$response->getBody()->write($content);
+					$response->getBody()
+						->write($content);
 				}
 			} elseif ($ex instanceof IPub\SlimRouter\Exceptions\HttpException) {
 				$response = $response->withStatus($ex->getCode());
@@ -112,7 +116,9 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 				$response->getBody()
 					->write($content);
 			} else {
-				$this->logger->error('[FB::JSON_API] An error occurred during request handling', [
+				$this->logger->error('An unknown error occurred during request handling', [
+					'source' => 'middleware',
+					'type' => 'json:api',
 					'exception' => [
 						'message' => $ex->getMessage(),
 						'code'    => $ex->getCode(),
@@ -132,7 +138,8 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 						'There was an server error, please try again later'
 					));
 
-				$response->getBody()->write($content);
+				$response->getBody()
+					->write($content);
 			}
 		}
 
