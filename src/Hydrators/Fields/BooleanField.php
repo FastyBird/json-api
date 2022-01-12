@@ -31,13 +31,6 @@ final class BooleanField extends Field
 	/** @var bool */
 	private bool $isNullable;
 
-	/**
-	 * @param bool $isNullable
-	 * @param string $mappedName
-	 * @param string $fieldName
-	 * @param bool $isRequired
-	 * @param bool $isWritable
-	 */
 	public function __construct(
 		bool $isNullable,
 		string $mappedName,

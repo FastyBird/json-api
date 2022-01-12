@@ -52,11 +52,6 @@ class JsonApiMiddleware implements Server\MiddlewareInterface
 	/** @var DI\Container */
 	private DI\Container $container;
 
-	/**
-	 * @param Message\ResponseFactoryInterface $responseFactory
-	 * @param DI\Container $container
-	 * @param Log\LoggerInterface|null $logger
-	 */
 	public function __construct(
 		Message\ResponseFactoryInterface $responseFactory,
 		DI\Container $container,

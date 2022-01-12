@@ -18,6 +18,7 @@ namespace FastyBird\JsonApi\Hydrators;
 use FastyBird\JsonApi\JsonApi;
 use IPub\JsonAPIDocument;
 use Nette\DI;
+use Psr\Log;
 use SplObjectStorage;
 
 /**
@@ -35,13 +36,18 @@ class HydratorsContainer
 	/** @var DI\Container */
 	private DI\Container $container;
 
+	/** @var Log\LoggerInterface */
+	private Log\LoggerInterface $logger;
+
 	/** @var JsonApi\JsonApiSchemaContainer|null */
 	private ?JsonApi\JsonApiSchemaContainer $jsonApiSchemaContainer = null;
 
 	public function __construct(
-		DI\Container $container
+		DI\Container $container,
+		?Log\LoggerInterface $logger = null
 	) {
 		$this->container = $container;
+		$this->logger = $logger ?? new Log\NullLogger();
 
 		$this->hydrators = new SplObjectStorage();
 	}
@@ -58,12 +64,25 @@ class HydratorsContainer
 		$this->hydrators->rewind();
 
 		foreach ($this->hydrators as $hydrator) {
-			$schema = $this->getSchemaContainer()->getSchemaByClassName($hydrator->getEntityName());
+			$schema = $this->getSchemaContainer()
+				->getSchemaByClassName($hydrator->getEntityName());
 
-			if ($schema->getType() === $document->getResource()->getType()) {
+			if ($schema->getType() === $document->getResource()
+					->getType()) {
 				return $hydrator;
 			}
 		}
+
+		$this->logger->debug('Hydrator for given document was not found', [
+			'source'   => 'hydrators-container',
+			'type'     => 'find-hydrator',
+			'document' => [
+				'type' => $document->getResource()
+					->getType(),
+				'id'   => $document->getResource()
+					->getId(),
+			],
+		]);
 
 		return null;
 	}
