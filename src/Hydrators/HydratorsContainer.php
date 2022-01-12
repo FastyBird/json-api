@@ -67,8 +67,7 @@ class HydratorsContainer
 			$schema = $this->getSchemaContainer()
 				->getSchemaByClassName($hydrator->getEntityName());
 
-			if ($schema->getType() === $document->getResource()
-					->getType()) {
+			if ($schema->getType() === $document->getResource()->getType()) {
 				return $hydrator;
 			}
 		}
