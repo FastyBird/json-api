@@ -347,7 +347,7 @@ abstract class Hydrator
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
-				if (class_exists($className)) {
+				if (is_string($className) && class_exists($className)) {
 					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
 				}
 			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAnnotations, true)) {
