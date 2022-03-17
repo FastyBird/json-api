@@ -395,6 +395,7 @@ abstract class Hydrator
 				$isArray = false;
 				$isBool = false;
 				$isClass = false;
+				$isMixed = false;
 
 				$isNullable = false;
 
@@ -444,6 +445,11 @@ abstract class Hydrator
 
 					} elseif (strtolower($varDatatype) === 'null') {
 						$isNullable = true;
+
+					} elseif (strtolower($varDatatype) === 'mixed') {
+						$isMixed = true;
+
+						$typesFound++;
 					}
 				}
 
@@ -541,6 +547,15 @@ abstract class Hydrator
 
 					} elseif ($isBool) {
 						$fields[] = new Hydrators\Fields\BooleanField(
+							$isNullable,
+							$mappedKey,
+							$fieldName,
+							$isRequired,
+							$isWritable
+						);
+
+					} elseif ($isMixed) {
+						$fields[] = new Hydrators\Fields\MixedField(
 							$isNullable,
 							$mappedKey,
 							$fieldName,
