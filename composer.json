@@ -60,7 +60,7 @@
 
   "require-dev" : {
     "contributte/translation": "^0.9",
-    "fastybird/web-server": "^0.6",
+    "fastybird/web-server": "^0.8",
     "mockery/mockery": "^1.4",
     "ninjify/nunjuck": "^0.3",
     "ninjify/qa": "^0.13",
