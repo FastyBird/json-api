@@ -705,7 +705,7 @@ abstract class Hydrator
 			}
 		}
 
-		if ($name === 'var' && $rp->getType() !== null) {
+		if ($name === 'var' && $rp->getType() instanceof ReflectionNamedType) {
 			return $rp->getType()->getName();
 		}
 
