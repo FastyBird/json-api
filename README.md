@@ -1,7 +1,7 @@
 # FastyBird {JSON:API} library
 
-[![Build Status](https://badgen.net/github/checks/FastyBird/json-api/master?cache=300&style=flast-square)](https://github.com/FastyBird/json-api/actions)
-[![Licence](https://badgen.net/github/license/FastyBird/json-api?cache=300&style=flast-square)](https://github.com/FastyBird/json-api/blob/master/LICENSE.md)
+[![Build Status](https://badgen.net/github/checks/FastyBird/json-api/main?cache=300&style=flast-square)](https://github.com/FastyBird/json-api/actions)
+[![Licence](https://badgen.net/github/license/FastyBird/json-api?cache=300&style=flast-square)](https://github.com/FastyBird/json-api/blob/main/LICENSE.md)
 [![Code coverage](https://badgen.net/coveralls/c/github/FastyBird/json-api?cache=300&style=flast-square)](https://coveralls.io/r/FastyBird/json-api)
 
 ![PHP](https://badgen.net/packagist/php/FastyBird/json-api?cache=300&style=flast-square)
@@ -34,7 +34,7 @@ composer require fastybird/json-api
 ## Documentation
 
 Learn how to use {JSON:API} data hydrators & document builders
-in [documentation](https://github.com/FastyBird/json-api/blob/master/.docs/en/index.md).
+in [documentation](https://github.com/FastyBird/json-api/blob/main/.docs/en/index.md).
 
 ***
 Homepage [https://www.fastybird.com](https://www.fastybird.com) and
