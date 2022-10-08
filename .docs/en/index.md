@@ -107,7 +107,7 @@ class ArticleHydrator extends Hydrators\Hydrator
                 $groups[] = $this->groupRepository->findById($identifier->getId());
     
             } catch (NotFoundException $ex) {
-                throw new Exceptions\JsonApiErrorException(
+                throw new Exceptions\JsonApiError(
                     422,
                     'Defined group relation was not found',
                     'Defined group relation was not foun in our application',
@@ -119,7 +119,7 @@ class ArticleHydrator extends Hydrators\Hydrator
         }
     
         if ($groups === []) {
-            throw new Exceptions\JsonApiErrorException(
+            throw new Exceptions\JsonApiError(
                 422,
                 'Groups relation is missing',
                 'Provide at least one group relation to create or update article',
@@ -311,7 +311,7 @@ use Neomerx\JsonApi;
 
 use Your\CoolApplication\Entities;
 
-class ArticleSchema extends Schemas\JsonApiSchema
+class ArticleSchema extends Schemas\JsonApi
 {
     /** @var Routing\IRouter */
     private Routing\IRouter $router;

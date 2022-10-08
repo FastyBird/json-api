@@ -30,57 +30,30 @@ abstract class Field implements IField
 
 	use Nette\SmartObject;
 
-	/** @var string */
-	private string $mappedName;
-
-	/** @var string */
-	private string $fieldName;
-
-	/** @var bool */
-	private bool $isRequired;
-
-	/** @var bool */
-	private bool $isWritable;
-
 	public function __construct(
-		string $mappedName,
-		string $fieldName,
-		bool $isRequired,
-		bool $isWritable
-	) {
-		$this->mappedName = $mappedName;
-		$this->fieldName = $fieldName;
-		$this->isRequired = $isRequired;
-		$this->isWritable = $isWritable;
+		private string $mappedName,
+		private string $fieldName,
+		private bool $isRequired,
+		private bool $isWritable,
+	)
+	{
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getMappedName(): string
 	{
 		return $this->mappedName;
 	}
 
-	/**
-	 * @return string
-	 */
 	public function getFieldName(): string
 	{
 		return $this->fieldName;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isRequired(): bool
 	{
 		return $this->isRequired;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isWritable(): bool
 	{
 		return $this->isWritable;

@@ -28,31 +28,17 @@ use IPub\JsonAPIDocument;
 interface IField
 {
 
-	/**
-	 * @return string
-	 */
 	public function getMappedName(): string;
 
-	/**
-	 * @return string
-	 */
 	public function getFieldName(): string;
 
-	/**
-	 * @return bool
-	 */
 	public function isRequired(): bool;
 
-	/**
-	 * @return bool
-	 */
 	public function isWritable(): bool;
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return mixed
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes);
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): mixed;
 
 }

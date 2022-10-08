@@ -28,33 +28,26 @@ use IPub\JsonAPIDocument;
 final class BooleanField extends Field
 {
 
-	/** @var bool */
-	private bool $isNullable;
-
 	public function __construct(
-		bool $isNullable,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return bool|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): ?bool
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): bool|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
 		if ($value !== null) {
 			return (bool) $value;
-
 		} elseif ($this->isNullable) {
 			return null;
 		}
@@ -62,9 +55,6 @@ final class BooleanField extends Field
 		return false;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;

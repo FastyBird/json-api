@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * IJsonApiException.php
+ * Exception.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -10,14 +10,14 @@
  * @subpackage     Exceptions
  * @since          0.1.0
  *
- * @date           06.03.18
+ * @date           25.05.20
  */
 
 namespace FastyBird\JsonApi\Exceptions;
 
 use Throwable;
 
-interface IJsonApiException extends Throwable
+interface Exception extends Throwable
 {
 
 }

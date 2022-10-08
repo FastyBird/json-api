@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * IException.php
+ * InvalidState.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -15,9 +15,9 @@
 
 namespace FastyBird\JsonApi\Exceptions;
 
-use Throwable;
+use RuntimeException;
 
-interface IException extends Throwable
+class InvalidState extends RuntimeException implements Exception
 {
 
 }

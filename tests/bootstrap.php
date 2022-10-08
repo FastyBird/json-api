@@ -1,5 +1,7 @@
 <?php declare(strict_types = 1);
 
+// phpcs:ignoreFile
+
 use Ninjify\Nunjuck\Environment;
 
 if (@!include __DIR__ . '/../vendor/autoload.php') {

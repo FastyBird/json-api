@@ -16,6 +16,7 @@
 namespace FastyBird\JsonApi\Hydrators\Fields;
 
 use IPub\JsonAPIDocument;
+use function is_scalar;
 
 /**
  * Entity text field
@@ -28,36 +29,29 @@ use IPub\JsonAPIDocument;
 final class TextField extends Field
 {
 
-	/** @var bool */
-	private bool $isNullable;
-
 	public function __construct(
-		bool $isNullable,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return string|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): ?string
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): string|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
-		return $value !== null && is_scalar($value) ? ($this->isNullable && $value === '' ? null : (string) $value) : null;
+		return $value !== null && is_scalar($value)
+			? ($this->isNullable && $value === '' ? null : (string) $value)
+			: null;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;

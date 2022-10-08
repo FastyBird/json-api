@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * JsonApiSchema.php
+ * JsonApi.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -16,47 +16,45 @@
 namespace FastyBird\JsonApi\Schemas;
 
 use FastyBird\JsonApi\Exceptions;
-use Neomerx\JsonApi;
+use Neomerx\JsonApi\Contracts;
+use Neomerx\JsonApi\Schema;
 use Nette;
+use function method_exists;
+use function property_exists;
 
 /**
  * Entity schema constructor
  *
+ * @template   T of object
+ * @implements   Contracts\Schema\SchemaInterface<T>
+ *
  * @package            FastyBird:JsonApi!
  * @subpackage         Schemas
- *
  * @author             Adam Kadlec <adam.kadlec@fastybird.com>
- *
- * @phpstan-template   T of object
- * @phpstan-implements IJsonApiSchema<T>
  */
-abstract class JsonApiSchema implements IJsonApiSchema
+abstract class JsonApi implements Contracts\Schema\SchemaInterface
 {
 
 	use Nette\SmartObject;
 
-	/** @var string|null */
-	private ?string $subUrl = null;
+	private string|null $subUrl = null;
+
+	abstract public function getEntityClass(): string;
 
 	/**
-	 * @param object $resource
-	 * @param JsonApi\Contracts\Schema\ContextInterface $context
-	 *
 	 * @return iterable<string, mixed>
 	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getRelationships($resource, JsonApi\Contracts\Schema\ContextInterface $context): iterable
+	public function getRelationships($resource, Contracts\Schema\ContextInterface $context): iterable
 	{
 		return [];
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return iterable<string, JsonApi\Contracts\Schema\LinkInterface>
+	 * @return iterable<string, Contracts\Schema\LinkInterface>
 	 *
 	 * @phpstan-param T $resource
 	 *
@@ -65,29 +63,21 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	public function getLinks($resource): iterable
 	{
 		return [
-			JsonApi\Contracts\Schema\LinkInterface::SELF => $this->getSelfLink($resource),
+			Contracts\Schema\LinkInterface::SELF => $this->getSelfLink($resource),
 		];
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return JsonApi\Contracts\Schema\LinkInterface
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getSelfLink($resource): JsonApi\Contracts\Schema\LinkInterface
+	public function getSelfLink($resource): Contracts\Schema\LinkInterface
 	{
-		return new JsonApi\Schema\Link(true, $this->getSelfSubUrl($resource), false);
+		return new Schema\Link(true, $this->getSelfSubUrl($resource), false);
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return string
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
@@ -99,8 +89,6 @@ abstract class JsonApiSchema implements IJsonApiSchema
 
 	/**
 	 * Get resources sub-URL.
-	 *
-	 * @return string
 	 */
 	private function getResourcesSubUrl(): string
 	{
@@ -112,19 +100,14 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return string|null
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getId($resource): ?string
+	public function getId($resource): string|null
 	{
 		if (method_exists($resource, 'getId')) {
 			return (string) $resource->getId();
-
 		} elseif (property_exists($resource, 'id')) {
 			return (string) $resource->id;
 		}
@@ -133,46 +116,34 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param object $resource
-	 * @param string $name
-	 *
-	 * @return JsonApi\Contracts\Schema\LinkInterface
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getRelationshipSelfLink($resource, string $name): JsonApi\Contracts\Schema\LinkInterface
+	public function getRelationshipSelfLink($resource, string $name): Contracts\Schema\LinkInterface
 	{
 		// Feel free to override this method to change default URL or add meta
-		$url = $this->getSelfSubUrl($resource) . '/' . JsonApi\Contracts\Schema\DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $name;
+		$url = $this->getSelfSubUrl(
+			$resource,
+		) . '/' . Contracts\Schema\DocumentInterface::KEYWORD_RELATIONSHIPS . '/' . $name;
 
-		return new JsonApi\Schema\Link(true, $url, false);
+		return new Schema\Link(true, $url, false);
 	}
 
 	/**
-	 * @param object $resource
-	 * @param string $name
-	 *
-	 * @return JsonApi\Contracts\Schema\LinkInterface
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getRelationshipRelatedLink($resource, string $name): JsonApi\Contracts\Schema\LinkInterface
+	public function getRelationshipRelatedLink($resource, string $name): Contracts\Schema\LinkInterface
 	{
 		// Feel free to override this method to change default URL or add meta
 		$url = $this->getSelfSubUrl($resource) . '/' . $name;
 
-		return new JsonApi\Schema\Link(true, $url, false);
+		return new Schema\Link(true, $url, false);
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return bool
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
@@ -183,24 +154,16 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return mixed
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getIdentifierMeta($resource)
+	public function getIdentifierMeta($resource): mixed
 	{
-		throw new Exceptions\LogicException('Default schema does not provide any meta');
+		throw new Exceptions\Logic('Default schema does not provide any meta');
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return bool
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
@@ -211,30 +174,20 @@ abstract class JsonApiSchema implements IJsonApiSchema
 	}
 
 	/**
-	 * @param object $resource
-	 *
-	 * @return mixed
-	 *
 	 * @phpstan-param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getResourceMeta($resource)
+	public function getResourceMeta($resource): mixed
 	{
-		throw new Exceptions\LogicException('Default schema does not provide any meta');
+		throw new Exceptions\Logic('Default schema does not provide any meta');
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function isAddSelfLinkInRelationshipByDefault(string $relationshipName): bool
 	{
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public function isAddRelatedLinkInRelationshipByDefault(string $relationshipName): bool
 	{
 		return true;

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * JsonApiMiddleware.php
+ * JsonApi.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -24,6 +24,17 @@ use Nette\Utils;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use function array_key_exists;
+use function array_merge;
+use function call_user_func_array;
+use function explode;
+use function http_build_query;
+use function is_array;
+use function round;
+use function str_replace;
+use function strval;
+use function substr;
+use const JSON_PRETTY_PRINT;
 
 /**
  * {JSON:API} formatting output handling middleware
@@ -37,52 +48,39 @@ class Builder
 {
 
 	private const LINK_SELF = Contracts\Schema\DocumentInterface::KEYWORD_SELF;
+
 	private const LINK_RELATED = Contracts\Schema\DocumentInterface::KEYWORD_RELATED;
+
 	private const LINK_FIRST = Contracts\Schema\DocumentInterface::KEYWORD_FIRST;
+
 	private const LINK_LAST = Contracts\Schema\DocumentInterface::KEYWORD_LAST;
+
 	private const LINK_NEXT = Contracts\Schema\DocumentInterface::KEYWORD_NEXT;
+
 	private const LINK_PREV = Contracts\Schema\DocumentInterface::KEYWORD_PREV;
 
-	/** @var string|string[] */
-	private $metaAuthor;
-
-	/** @var string|null */
-	private ?string $metaCopyright;
-
-	/** @var DI\Container */
-	private DI\Container $container;
-
 	/**
-	 * @param DI\Container $container
-	 * @param string|string[] $metaAuthor
-	 * @param string|null $metaCopyright
+	 * @param string|Array<string> $metaAuthor
 	 */
 	public function __construct(
-		DI\Container $container,
-		$metaAuthor,
-		?string $metaCopyright = null
-	) {
-		$this->container = $container;
-
-		$this->metaAuthor = $metaAuthor;
-		$this->metaCopyright = $metaCopyright;
+		private DI\Container $container,
+		private string|array $metaAuthor,
+		private string|null $metaCopyright = null,
+	)
+	{
 	}
 
 	/**
-	 * @param ServerRequestInterface $request
-	 * @param ResponseInterface $response
 	 * @param object|Array<object>|null $entity
-	 * @param int|null $totalCount
-	 *
-	 * @return ResponseInterface
 	 */
 	public function build(
 		ServerRequestInterface $request,
 		ResponseInterface $response,
-		$entity,
-		?int $totalCount = null,
-		?callable $linkValidator = null
-	): ResponseInterface {
+		object|array|null $entity,
+		int|null $totalCount = null,
+		callable|null $linkValidator = null,
+	): ResponseInterface
+	{
 		$encoder = $this->getEncoder();
 
 		$links = [
@@ -119,21 +117,21 @@ class Builder
 				$uriSelf = $uri->withQuery($this->buildPageQuery($pageOffset, $pageLimit));
 				$uriFirst = $uri->withQuery($this->buildPageQuery(0, $pageLimit));
 				$uriLast = $uri->withQuery($this->buildPageQuery($lastPage, $pageLimit));
-				$uriPrev = $uri->withQuery($this->buildPageQuery(($pageOffset - $pageLimit), $pageLimit));
-				$uriNext = $uri->withQuery($this->buildPageQuery(($pageOffset + $pageLimit), $pageLimit));
+				$uriPrev = $uri->withQuery($this->buildPageQuery($pageOffset - $pageLimit, $pageLimit));
+				$uriNext = $uri->withQuery($this->buildPageQuery($pageOffset + $pageLimit, $pageLimit));
 
 				$links = array_merge($links, [
-					self::LINK_SELF  => new Schema\Link(false, $this->uriToString($uriSelf), false),
+					self::LINK_SELF => new Schema\Link(false, $this->uriToString($uriSelf), false),
 					self::LINK_FIRST => new Schema\Link(false, $this->uriToString($uriFirst), false),
 				]);
 
-				if (($pageOffset - 1) >= 0) {
+				if ($pageOffset - 1 >= 0) {
 					$links = array_merge($links, [
 						self::LINK_PREV => new Schema\Link(false, $this->uriToString($uriPrev), false),
 					]);
 				}
 
-				if ((($totalCount - $pageLimit) - ($pageOffset + $pageLimit)) >= 0) {
+				if ($totalCount - $pageLimit - ($pageOffset + $pageLimit) >= 0) {
 					$links = array_merge($links, [
 						self::LINK_NEXT => new Schema\Link(false, $this->uriToString($uriNext), false),
 					]);
@@ -159,8 +157,12 @@ class Builder
 				&& isset($encodedData['data']['links'][self::LINK_SELF]) // @phpstan-ignore-line
 			) {
 				$encoder->withLinks(array_merge($links, [
-					// @phpstan-ignore-next-line
-					self::LINK_RELATED => new Schema\Link(false, strval($encodedData['data']['links'][self::LINK_SELF]), false),
+					self::LINK_RELATED => new Schema\Link(
+						false,
+						// @phpstan-ignore-next-line
+						strval($encodedData['data']['links'][self::LINK_SELF]),
+						false,
+					),
 				]));
 
 			} else {
@@ -197,14 +199,11 @@ class Builder
 			->withHeader('Content-Type', Contracts\Http\Headers\MediaTypeInterface::JSON_API_MEDIA_TYPE);
 	}
 
-	/**
-	 * @return JsonApi\JsonApiEncoder
-	 */
-	private function getEncoder(): JsonApi\JsonApiEncoder
+	private function getEncoder(): JsonApi\Encoder
 	{
-		$encoder = new JsonApi\JsonApiEncoder(
+		$encoder = new JsonApi\Encoder(
 			new Neomerx\JsonApi\Factories\Factory(),
-			$this->container->getByType(Contracts\Schema\SchemaContainerInterface::class)
+			$this->container->getByType(Contracts\Schema\SchemaContainerInterface::class),
 		);
 
 		$encoder->withEncodeOptions(JSON_PRETTY_PRINT);
@@ -214,11 +213,6 @@ class Builder
 		return $encoder;
 	}
 
-	/**
-	 * @param UriInterface $uri
-	 *
-	 * @return string
-	 */
 	private function uriToString(UriInterface $uri): string
 	{
 		$result = '';
@@ -242,19 +236,17 @@ class Builder
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return Array<mixed>
 	 */
 	private function getBaseMeta(): array
 	{
 		$meta = [];
 
-		if ($this->metaAuthor !== null) {
-			if (is_array($this->metaAuthor)) {
-				$meta['authors'] = $this->metaAuthor;
+		if (is_array($this->metaAuthor)) {
+			$meta['authors'] = $this->metaAuthor;
 
-			} else {
-				$meta['author'] = $this->metaAuthor;
-			}
+		} else {
+			$meta['author'] = $this->metaAuthor;
 		}
 
 		if ($this->metaCopyright !== null) {
@@ -264,18 +256,12 @@ class Builder
 		return $meta;
 	}
 
-	/**
-	 * @param int $offset
-	 * @param int|string $limit
-	 *
-	 * @return string
-	 */
-	private function buildPageQuery(int $offset, $limit): string
+	private function buildPageQuery(int $offset, int|string $limit): string
 	{
 		$query = [
 			'page' => [
 				'offset' => $offset,
-				'limit'  => $limit,
+				'limit' => $limit,
 			],
 		];
 

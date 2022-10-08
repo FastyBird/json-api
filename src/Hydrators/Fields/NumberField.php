@@ -16,6 +16,7 @@
 namespace FastyBird\JsonApi\Hydrators\Fields;
 
 use IPub\JsonAPIDocument;
+use function is_scalar;
 
 /**
  * Entity numeric field
@@ -28,41 +29,28 @@ use IPub\JsonAPIDocument;
 final class NumberField extends Field
 {
 
-	/** @var bool */
-	private bool $isDecimal;
-
-	/** @var bool */
-	private bool $isNullable;
-
 	public function __construct(
-		bool $isDecimal,
-		bool $isNullable,
+		private bool $isDecimal,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->isDecimal = $isDecimal;
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return float|int|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes)
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): float|int|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
 		return $value !== null && is_scalar($value) ? ($this->isDecimal ? (float) $value : (int) $value) : null;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;

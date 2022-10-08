@@ -17,6 +17,8 @@ namespace FastyBird\JsonApi\Hydrators\Fields;
 
 use FastyBird\JsonApi\Exceptions;
 use IPub\JsonAPIDocument;
+use function is_array;
+use function sprintf;
 
 /**
  * Entity one to one relation entity field
@@ -32,12 +34,14 @@ final class SingleEntityField extends EntityField
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
-	 * @return mixed[]|null
+	 * @return Array<mixed>|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): ?array
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): array|null
 	{
 		if ($this->isRelationship()) {
-			throw new Exceptions\InvalidStateException(sprintf('Single entity field \'%s\' could not be mapped as attribute.', $this->getMappedName()));
+			throw new Exceptions\InvalidState(
+				sprintf('Single entity field \'%s\' could not be mapped as attribute.', $this->getMappedName()),
+			);
 		}
 
 		$value = $attributes->get($this->getMappedName());

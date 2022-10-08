@@ -1,10 +1,10 @@
 parameters:
     level: max
     stubFiles:
-        - tests/PHPStan/stubs/Neomerx/JsonApi/Contracts/Factories/FactoryInterface.php
-        - tests/PHPStan/stubs/Neomerx/JsonApi/Contracts/Schema/ContextInterface.php
-        - tests/PHPStan/stubs/Neomerx/JsonApi/Contracts/Schema/LinkInterface.php
-        - tests/PHPStan/stubs/Neomerx/JsonApi/Contracts/Schema/SchemaContainerInterface.php
-        - tests/PHPStan/stubs/Neomerx/JsonApi/Contracts/Schema/SchemaInterface.php
-        - tests/PHPStan/stubs/Neomerx/JsonApi/Factories/Factory.php
+        - tests/stubs/Neomerx/JsonApi/Contracts/Factories/FactoryInterface.stub
+        - tests/stubs/Neomerx/JsonApi/Contracts/Schema/ContextInterface.stub
+        - tests/stubs/Neomerx/JsonApi/Contracts/Schema/LinkInterface.stub
+        - tests/stubs/Neomerx/JsonApi/Contracts/Schema/SchemaContainerInterface.stub
+        - tests/stubs/Neomerx/JsonApi/Contracts/Schema/SchemaInterface.stub
+        - tests/stubs/Neomerx/JsonApi/Factories/Factory.stub
     checkGenericClassInNonGenericObjectType: false

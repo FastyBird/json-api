@@ -17,6 +17,8 @@ namespace FastyBird\JsonApi\Hydrators\Fields;
 
 use Consistence;
 use IPub\JsonAPIDocument;
+use function call_user_func;
+use function is_callable;
 
 /**
  * Entity consistence enum field
@@ -29,32 +31,22 @@ use IPub\JsonAPIDocument;
 final class EnumField extends Field
 {
 
-	/** @var string */
-	private string $typeClass;
-
-	/** @var bool */
-	private bool $isNullable = true;
-
 	public function __construct(
-		string $typeClass,
-		bool $isNullable,
+		private string $typeClass,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->typeClass = $typeClass;
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return Consistence\Enum\Enum|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): ?Consistence\Enum\Enum
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): Consistence\Enum\Enum|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
@@ -69,9 +61,6 @@ final class EnumField extends Field
 		return null;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;

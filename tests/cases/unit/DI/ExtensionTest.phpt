@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\Cases;
+namespace Tests\Cases\Unit;
 
 use FastyBird\JsonApi\Builder;
 use FastyBird\JsonApi\DI;
@@ -24,9 +24,9 @@ final class ExtensionTest extends BaseTestCase
 
 		Assert::notNull($container->getByType(Builder\Builder::class));
 
-		Assert::notNull($container->getByType(Middleware\JsonApiMiddleware::class));
+		Assert::notNull($container->getByType(Middleware\JsonApi::class));
 
-		Assert::notNull($container->getByType(JsonApi\JsonApiSchemaContainer::class));
+		Assert::notNull($container->getByType(JsonApi\SchemaContainer::class));
 	}
 
 	/**

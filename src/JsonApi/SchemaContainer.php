@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * JsonApiSchemaContainer.php
+ * SchemaContainer.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -18,6 +18,9 @@ namespace FastyBird\JsonApi\JsonApi;
 use FastyBird\JsonApi\Exceptions;
 use FastyBird\JsonApi\Schemas;
 use Neomerx\JsonApi;
+use function interface_exists;
+use function strrpos;
+use function substr;
 
 /**
  * Json:API schemas container
@@ -27,10 +30,11 @@ use Neomerx\JsonApi;
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-class JsonApiSchemaContainer extends JsonApi\Schema\SchemaContainer
+class SchemaContainer extends JsonApi\Schema\SchemaContainer
 {
 
 	private const DOCTRINE_MARKER = '__CG__';
+
 	private const DOCTRINE_MARKER_LENGTH = 6;
 
 	public function __construct()
@@ -39,34 +43,25 @@ class JsonApiSchemaContainer extends JsonApi\Schema\SchemaContainer
 	}
 
 	/**
-	 * @param Schemas\IJsonApiSchema $schema
-	 *
-	 * @return void
-	 *
-	 * @phpstan-template T of Schemas\JsonApiSchema
+	 * @phpstan-template T of Schemas\JsonApi
 	 * @phpstan-param    T $schema
 	 */
-	public function add(Schemas\IJsonApiSchema $schema): void
+	public function add(Schemas\JsonApi $schema): void
 	{
-		$this->setProviderMapping($schema->getEntityClass(), get_class($schema));
+		$this->setProviderMapping($schema->getEntityClass(), $schema::class);
 		$this->setResourceToJsonTypeMapping($schema->getType(), $schema->getEntityClass());
 		$this->setCreatedProvider($schema->getEntityClass(), $schema);
 	}
 
-	/**
-	 * @param string $resourceType
-	 *
-	 * @return Schemas\IJsonApiSchema
-	 */
-	public function getSchemaByClassName(string $resourceType): Schemas\IJsonApiSchema
+	public function getSchemaByClassName(string $resourceType): Schemas\JsonApi
 	{
 		$schema = $this->getSchemaByType($resourceType);
 
-		if ($schema instanceof Schemas\IJsonApiSchema) {
+		if ($schema instanceof Schemas\JsonApi) {
 			return $schema;
 		}
 
-		throw new Exceptions\InvalidStateException('');
+		throw new Exceptions\InvalidState('');
 	}
 
 	/**
@@ -78,7 +73,7 @@ class JsonApiSchemaContainer extends JsonApi\Schema\SchemaContainer
 			interface_exists('\Doctrine\Persistence\Proxy')
 			|| interface_exists('\Doctrine\Common\Persistence\Proxy')
 		) {
-			$class = get_class($resource);
+			$class = $resource::class;
 
 			$pos = strrpos($class, '\\' . self::DOCTRINE_MARKER . '\\');
 

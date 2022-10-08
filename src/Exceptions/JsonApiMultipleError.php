@@ -17,7 +17,7 @@ namespace FastyBird\JsonApi\Exceptions;
 
 use Exception as PHPException;
 use Fig\Http\Message\StatusCodeInterface;
-use Neomerx\JsonApi;
+use Neomerx\JsonApi as NeomerxJsonApi;
 
 /**
  * Process multiple error
@@ -27,37 +27,32 @@ use Neomerx\JsonApi;
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-class JsonApiMultipleErrorException extends PHPException implements IJsonApiException
+class JsonApiMultipleError extends PHPException implements JsonApi
 {
 
-	/** @var JsonApi\Schema\Error[] */
+	/** @var Array<NeomerxJsonApi\Schema\Error> */
 	private array $errors = [];
 
 	public function __construct()
 	{
 		parent::__construct(
 			'Json:API multiple errors',
-			StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY
+			StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 		);
 	}
 
 	/**
-	 * @param int $code
-	 * @param string $title
-	 * @param string|null $detail
-	 * @param string[]|null $source
-	 * @param string|null $type
-	 *
-	 * @return void
+	 * @param Array<string>|null $source
 	 */
 	public function addError(
 		int $code,
 		string $title,
-		?string $detail = null,
-		?array $source = null,
-		?string $type = null
-	): void {
-		$this->errors[] = new JsonApi\Schema\Error(
+		string|null $detail = null,
+		array|null $source = null,
+		string|null $type = null,
+	): void
+	{
+		$this->errors[] = new NeomerxJsonApi\Schema\Error(
 			$type,
 			null,
 			null,
@@ -65,20 +60,17 @@ class JsonApiMultipleErrorException extends PHPException implements IJsonApiExce
 			(string) $code,
 			$title,
 			$detail,
-			$source
+			$source,
 		);
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function hasErrors(): bool
 	{
 		return $this->errors !== [];
 	}
 
 	/**
-	 * @return JsonApi\Schema\Error[]
+	 * @return Array<NeomerxJsonApi\Schema\Error>
 	 */
 	public function getErrors(): array
 	{

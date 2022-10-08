@@ -36,16 +36,40 @@ use ReflectionException;
 use ReflectionNamedType;
 use ReflectionProperty;
 use Throwable;
+use function array_key_exists;
+use function array_map;
+use function array_merge;
+use function array_unique;
+use function assert;
+use function call_user_func;
+use function class_exists;
+use function count;
+use function explode;
+use function gettype;
+use function in_array;
+use function interface_exists;
+use function is_array;
+use function is_callable;
+use function is_numeric;
+use function is_object;
+use function is_string;
+use function method_exists;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function strtolower;
+use function trim;
+use function ucfirst;
+use function ucwords;
 
 /**
  * Entity hydrator
  *
+ * @phpstan-template T of object
+ *
  * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
- *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
- *
- * @phpstan-template T of object
  */
 abstract class Hydrator
 {
@@ -56,10 +80,8 @@ abstract class Hydrator
 
 	/**
 	 * Whether the resource has a client generated id
-	 *
-	 * @var string|null
 	 */
-	protected ?string $entityIdentifier = null;
+	protected string|null $entityIdentifier = null;
 
 	/**
 	 * The resource attribute keys to hydrate
@@ -76,7 +98,7 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var mixed[]
+	 * @var Array<mixed>
 	 */
 	protected array $attributes = [];
 
@@ -95,90 +117,66 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var mixed[]
+	 * @var Array<mixed>
 	 */
 	protected array $compositedAttributes = [];
 
 	/**
 	 * Resource relationship keys that should be automatically hydrated
 	 *
-	 * @var string[]
+	 * @var Array<string>
 	 */
 	protected array $relationships = [];
 
-	/** @var Localization\Translator */
-	protected Localization\Translator $translator;
+	/** @var Array<mixed>|null */
+	private array|null $normalizedAttributes = null;
 
-	/** @var mixed[]|null */
-	private ?array $normalizedAttributes = null;
+	/** @var Array<mixed>|null */
+	private array|null $normalizedCompositedAttributes = null;
 
-	/** @var mixed[]|null */
-	private ?array $normalizedCompositedAttributes = null;
+	/** @var Array<mixed>|null */
+	private array|null $normalizedRelationships = null;
 
-	/** @var mixed[]|null */
-	private ?array $normalizedRelationships = null;
-
-	/** @var Persistence\ManagerRegistry */
-	private Persistence\ManagerRegistry $managerRegistry;
-
-	/** @var Common\Annotations\Reader */
 	private Common\Annotations\Reader $annotationReader;
 
-	/** @var Exceptions\JsonApiMultipleErrorException */
-	private Exceptions\JsonApiMultipleErrorException $errors;
-
-	/** @var Helpers\CrudReader|null */
-	private ?Helpers\CrudReader $crudReader;
+	private Exceptions\JsonApiMultipleError $errors;
 
 	public function __construct(
-		Persistence\ManagerRegistry $managerRegistry,
-		Localization\Translator $translator,
-		?Helpers\CrudReader $crudReader = null,
-		?Common\Cache\Cache $cache = null
-	) {
-		$this->managerRegistry = $managerRegistry;
+		private Persistence\ManagerRegistry $managerRegistry,
+		protected Localization\Translator $translator,
+		private Helpers\CrudReader|null $crudReader = null,
+		Common\Cache\Cache|null $cache = null,
+	)
+	{
+		$this->annotationReader = $cache !== null ? new Common\Annotations\PsrCachedReader(
+			new Common\Annotations\AnnotationReader(),
+			Common\Cache\Psr6\CacheAdapter::wrap($cache),
+		) : new Common\Annotations\AnnotationReader();
 
-		if ($cache !== null) {
-			$this->annotationReader = new Common\Annotations\PsrCachedReader(
-				new Common\Annotations\AnnotationReader(),
-				Common\Cache\Psr6\CacheAdapter::wrap($cache)
-			);
-
-		} else {
-			$this->annotationReader = new Common\Annotations\AnnotationReader();
-		}
-
-		$this->errors = new Exceptions\JsonApiMultipleErrorException();
-
-		$this->crudReader = $crudReader;
-		$this->translator = $translator;
+		$this->errors = new Exceptions\JsonApiMultipleError();
 	}
 
 	/**
-	 * @param JsonAPIDocument\IDocument $document
-	 * @param object|null $entity
-	 *
-	 * @return Utils\ArrayHash
-	 *
-	 * @throws Exceptions\IJsonApiException
+	 * @throws Exceptions\JsonApi
 	 * @throws Throwable
 	 *
 	 * @phpstan-param T|null $entity
 	 */
 	public function hydrate(
 		JsonAPIDocument\IDocument $document,
-		?object $entity = null
-	): Utils\ArrayHash {
+		object|null $entity = null,
+	): Utils\ArrayHash
+	{
 		$entityMapping = $this->mapEntity($this->getEntityName());
 
 		if (!$document->hasResource()) {
-			throw new Exceptions\JsonApiErrorException(
+			throw new Exceptions\JsonApiError(
 				StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.heading'),
 				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.message'),
 				[
 					'pointer' => 'data',
-				]
+				],
 			);
 		}
 
@@ -189,14 +187,14 @@ abstract class Hydrator
 			$resource->getAttributes(),
 			$entityMapping,
 			$entity,
-			null
+			null,
 		);
 
 		$relationships = $this->hydrateRelationships(
 			$resource->getRelationships(),
 			$entityMapping,
 			$document->hasIncluded() ? $document->getIncluded() : null,
-			$entity
+			$entity,
 		);
 
 		if ($this->errors->hasErrors()) {
@@ -208,7 +206,7 @@ abstract class Hydrator
 				'entity' => $this->getEntityName(),
 			],
 			$attributes,
-			$relationships
+			$relationships,
 		));
 
 		if ($entity === null) {
@@ -218,19 +216,19 @@ abstract class Hydrator
 				$identifier = $resource->getId();
 
 				if ($identifier === null || !Uuid\Uuid::isValid($identifier)) {
-					throw new Exceptions\JsonApiErrorException(
+					throw new Exceptions\JsonApiError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
 						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.heading'),
 						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.message'),
 						[
 							'pointer' => 'data/id',
-						]
+						],
 					);
 				}
 
 				$result[$identifierKey] = Uuid\Uuid::fromString($identifier);
 
-			} catch (JsonAPIDocument\Exceptions\RuntimeException $ex) {
+			} catch (JsonAPIDocument\Exceptions\RuntimeException) {
 				$result[$identifierKey] = Uuid\Uuid::uuid4();
 			}
 		}
@@ -239,16 +237,12 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @return string
-	 *
 	 * @phpstan-return class-string
 	 */
 	abstract public function getEntityName(): string;
 
 	/**
-	 * @param string $entityClassName
-	 *
-	 * @return Hydrators\Fields\IField[]
+	 * @return Array<Hydrators\Fields\IField>
 	 *
 	 * @phpstan-param class-string $entityClassName
 	 */
@@ -269,10 +263,10 @@ abstract class Hydrator
 				$rc = new ReflectionClass($entityClassName);
 
 			} else {
-				throw new Exceptions\InvalidStateException('Entity could not be parsed');
+				throw new Exceptions\InvalidState('Entity could not be parsed');
 			}
-		} catch (ReflectionException $ex) {
-			throw new Exceptions\InvalidStateException('Entity could not be parsed');
+		} catch (ReflectionException) {
+			throw new Exceptions\InvalidState('Entity could not be parsed');
 		}
 
 		foreach ($rc->getProperties() as $rp) {
@@ -282,7 +276,7 @@ abstract class Hydrator
 		$entityFields = array_unique(array_merge(
 			$reflectionProperties,
 			$classMetadata->getFieldNames(),
-			$classMetadata->getAssociationNames()
+			$classMetadata->getAssociationNames(),
 		));
 
 		$fields = [];
@@ -292,7 +286,7 @@ abstract class Hydrator
 				// Check if property in entity class exists
 				$rp = $rc->getProperty($fieldName);
 
-			} catch (ReflectionException $ex) {
+			} catch (ReflectionException) {
 				continue;
 			}
 
@@ -328,45 +322,78 @@ abstract class Hydrator
 			}
 
 			// Extract all entity property annotations
-			$propertyAnnotations = array_map((function ($annotation): string {
-				return get_class($annotation);
-			}), $this->annotationReader->getPropertyAnnotations($rp));
+			$propertyAnnotations = array_map(
+				(static fn ($annotation): string => $annotation::class),
+				$this->annotationReader->getPropertyAnnotations($rp),
+			);
 
 			if (in_array(ORM\Mapping\OneToOne::class, $propertyAnnotations, true)) {
-				/** @var ORM\Mapping\OneToOne $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToOne::class);
+				assert($mapping instanceof ORM\Mapping\OneToOne);
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
-					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
+					$fields[] = new Hydrators\Fields\SingleEntityField(
+						$className,
+						false,
+						$mappedKey,
+						$isRelationship,
+						$fieldName,
+						$isRequired,
+						$isWritable,
+					);
 				}
 			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAnnotations, true)) {
-				/** @var ORM\Mapping\OneToMany $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToMany::class);
+				assert($mapping instanceof ORM\Mapping\OneToMany);
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
-					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
+					$fields[] = new Hydrators\Fields\CollectionField(
+						$className,
+						true,
+						$mappedKey,
+						$isRelationship,
+						$fieldName,
+						$isRequired,
+						$isWritable,
+					);
 				}
 			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAnnotations, true)) {
-				/** @var ORM\Mapping\ManyToMany $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToMany::class);
+				assert($mapping instanceof ORM\Mapping\ManyToMany);
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
 				if ($className !== null && class_exists($className)) {
-					$fields[] = new Hydrators\Fields\CollectionField($className, true, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
+					$fields[] = new Hydrators\Fields\CollectionField(
+						$className,
+						true,
+						$mappedKey,
+						$isRelationship,
+						$fieldName,
+						$isRequired,
+						$isWritable,
+					);
 				}
 			} elseif (in_array(ORM\Mapping\ManyToOne::class, $propertyAnnotations, true)) {
-				/** @var ORM\Mapping\ManyToOne $mapping */
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToOne::class);
+				assert($mapping instanceof ORM\Mapping\ManyToOne);
 				$className = $mapping->targetEntity;
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
-					$fields[] = new Hydrators\Fields\SingleEntityField($className, false, $mappedKey, $isRelationship, $fieldName, $isRequired, $isWritable);
+					$fields[] = new Hydrators\Fields\SingleEntityField(
+						$className,
+						false,
+						$mappedKey,
+						$isRelationship,
+						$fieldName,
+						$isRequired,
+						$isWritable,
+					);
 				}
 			} else {
 				$varAnnotation = $this->parseAnnotation($rp, 'var');
@@ -377,9 +404,10 @@ abstract class Hydrator
 					$returnType = $rm->getReturnType();
 
 					if ($returnType instanceof ReflectionNamedType) {
-						$varAnnotation = ($varAnnotation === null ? '' : $varAnnotation . '|') . $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
+						$varAnnotation = ($varAnnotation === null ? '' : $varAnnotation . '|')
+							. $returnType->getName() . ($returnType->allowsNull() ? '|null' : '');
 					}
-				} catch (ReflectionException $ex) {
+				} catch (ReflectionException) {
 					// Nothing to do
 				}
 
@@ -460,20 +488,25 @@ abstract class Hydrator
 							$mappedKey,
 							$fieldName,
 							$isRequired,
-							$isWritable
+							$isWritable,
 						);
 
 					} elseif ($isClass && $className !== null) {
 						try {
 							$typeRc = new ReflectionClass($className);
 
-							if ($typeRc->implementsInterface(DateTimeInterface::class) || $className === DateTimeInterface::class) {
+							if (
+								$typeRc->implementsInterface(
+									DateTimeInterface::class,
+								)
+								|| $className === DateTimeInterface::class
+							) {
 								$fields[] = new Hydrators\Fields\DateTimeField(
 									$isNullable,
 									$mappedKey,
 									$fieldName,
 									$isRequired,
-									$isWritable
+									$isWritable,
 								);
 
 							} elseif ($typeRc->isSubclassOf(Consistence\Enum\Enum::class)) {
@@ -483,7 +516,7 @@ abstract class Hydrator
 									$mappedKey,
 									$fieldName,
 									$isRequired,
-									$isWritable
+									$isWritable,
 								);
 
 							} elseif ($typeRc->implementsInterface(ArrayAccess::class)) {
@@ -492,7 +525,7 @@ abstract class Hydrator
 									$mappedKey,
 									$fieldName,
 									$isRequired,
-									$isWritable
+									$isWritable,
 								);
 
 							} else {
@@ -503,10 +536,10 @@ abstract class Hydrator
 									$isRelationship,
 									$fieldName,
 									$isRequired,
-									$isWritable
+									$isWritable,
 								);
 							}
-						} catch (ReflectionException $ex) {
+						} catch (ReflectionException) {
 							$fields[] = new Hydrators\Fields\SingleEntityField(
 								$className,
 								$isNullable,
@@ -514,7 +547,7 @@ abstract class Hydrator
 								$isRelationship,
 								$fieldName,
 								$isRequired,
-								$isWritable
+								$isWritable,
 							);
 						}
 					} elseif ($isString) {
@@ -523,7 +556,7 @@ abstract class Hydrator
 							$mappedKey,
 							$fieldName,
 							$isRequired,
-							$isWritable
+							$isWritable,
 						);
 
 					} elseif ($isNumber || $isDecimal) {
@@ -533,7 +566,7 @@ abstract class Hydrator
 							$mappedKey,
 							$fieldName,
 							$isRequired,
-							$isWritable
+							$isWritable,
 						);
 
 					} elseif ($isArray) {
@@ -542,7 +575,7 @@ abstract class Hydrator
 							$mappedKey,
 							$fieldName,
 							$isRequired,
-							$isWritable
+							$isWritable,
 						);
 
 					} elseif ($isBool) {
@@ -551,7 +584,7 @@ abstract class Hydrator
 							$mappedKey,
 							$fieldName,
 							$isRequired,
-							$isWritable
+							$isWritable,
 						);
 
 					} elseif ($isMixed) {
@@ -560,7 +593,7 @@ abstract class Hydrator
 							$mappedKey,
 							$fieldName,
 							$isRequired,
-							$isWritable
+							$isWritable,
 						);
 					}
 				}
@@ -572,12 +605,8 @@ abstract class Hydrator
 
 	/**
 	 * Get the model method name for a resource relationship key
-	 *
-	 * @param string $entityKey
-	 *
-	 * @return string|null
 	 */
-	private function getRelationshipKey(string $entityKey): ?string
+	private function getRelationshipKey(string $entityKey): string|null
 	{
 		$this->normalizeRelationships();
 
@@ -586,9 +615,6 @@ abstract class Hydrator
 		return is_string($key) ? $key : null;
 	}
 
-	/**
-	 * @return void
-	 */
 	private function normalizeRelationships(): void
 	{
 		if (is_array($this->normalizedRelationships)) {
@@ -608,12 +634,7 @@ abstract class Hydrator
 		}
 	}
 
-	/**
-	 * @param string $entityKey
-	 *
-	 * @return string|null
-	 */
-	private function getAttributeKey(string $entityKey): ?string
+	private function getAttributeKey(string $entityKey): string|null
 	{
 		$this->normalizeAttributes();
 
@@ -622,9 +643,6 @@ abstract class Hydrator
 		return is_string($key) ? $key : null;
 	}
 
-	/**
-	 * @return void
-	 */
 	private function normalizeAttributes(): void
 	{
 		if (is_array($this->normalizedAttributes)) {
@@ -644,12 +662,7 @@ abstract class Hydrator
 		}
 	}
 
-	/**
-	 * @param string $entityKey
-	 *
-	 * @return string|null
-	 */
-	private function getCompositedAttributeKey(string $entityKey): ?string
+	private function getCompositedAttributeKey(string $entityKey): string|null
 	{
 		$this->normalizeCompositeAttributes();
 
@@ -658,9 +671,6 @@ abstract class Hydrator
 		return is_string($key) ? $key : null;
 	}
 
-	/**
-	 * @return void
-	 */
 	private function normalizeCompositeAttributes(): void
 	{
 		if (is_array($this->normalizedCompositedAttributes)) {
@@ -680,13 +690,7 @@ abstract class Hydrator
 		}
 	}
 
-	/**
-	 * @param ReflectionProperty $rp
-	 * @param string $name
-	 *
-	 * @return string|null
-	 */
-	private function parseAnnotation(ReflectionProperty $rp, string $name): ?string
+	private function parseAnnotation(ReflectionProperty $rp, string $name): string|null
 	{
 		if ($rp->getDocComment() === false) {
 			return null;
@@ -705,13 +709,10 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param string $className
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 * @param Hydrators\Fields\IField[] $entityMapping
-	 * @param object|null $entity
-	 * @param string|null $rootField
+	 * @param Array<Hydrators\Fields\IField> $entityMapping
 	 *
-	 * @return mixed[]
+	 * @return Array<mixed>
 	 *
 	 * @phpstan-param T|null $entity
 	 */
@@ -719,9 +720,10 @@ abstract class Hydrator
 		string $className,
 		JsonAPIDocument\Objects\IStandardObject $attributes,
 		array $entityMapping,
-		?object $entity,
-		?string $rootField
-	): array {
+		object|null $entity,
+		string|null $rootField,
+	): array
+	{
 		$data = [];
 
 		$isNew = $entity === null;
@@ -740,7 +742,9 @@ abstract class Hydrator
 			}
 
 			// If there is a specific method for this attribute, we'll hydrate that
-			$value = $this->hasCustomHydrateAttribute($field->getFieldName(), $attributes) ? $this->callHydrateAttribute($field->getFieldName(), $attributes, $entity) : $field->getValue($attributes);
+			$value = $this->hasCustomHydrateAttribute($field->getFieldName(), $attributes)
+				? $this->callHydrateAttribute($field->getFieldName(), $attributes, $entity)
+				: $field->getValue($attributes);
 
 			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
@@ -749,7 +753,7 @@ abstract class Hydrator
 					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.message'),
 					[
 						'pointer' => 'data/attributes/' . $field->getMappedName(),
-					]
+					],
 				);
 
 			} elseif ($field->isWritable() || ($isNew && $field->isRequired())) {
@@ -766,7 +770,7 @@ abstract class Hydrator
 							$fieldAttributes,
 							$this->mapEntity($fieldClassName),
 							$entity,
-							$field->getMappedName()
+							$field->getMappedName(),
 						);
 
 						if (
@@ -802,7 +806,16 @@ abstract class Hydrator
 							}
 
 							// If there is a specific method for this attribute, we'll hydrate that
-							$value = $this->hasCustomHydrateAttribute($parameter->getName(), $attributes) ? $this->callHydrateAttribute($parameter->getName(), $attributes, $entity) : $attributes->get($this->getAttributeKey($parameter->getName()) ?? $parameter->getName());
+							$value = $this->hasCustomHydrateAttribute(
+								$parameter->getName(),
+								$attributes,
+							) ? $this->callHydrateAttribute(
+								$parameter->getName(),
+								$attributes,
+								$entity,
+							) : $attributes->get(
+								$this->getAttributeKey($parameter->getName()) ?? $parameter->getName(),
+							);
 
 							$data[$parameter->getName()] = $value;
 
@@ -812,7 +825,16 @@ abstract class Hydrator
 							}
 
 							// If there is a specific method for this attribute, we'll hydrate that
-							$value = $this->hasCustomHydrateAttribute((string) $num, $attributes) ? $this->callHydrateAttribute((string) $num, $attributes, $entity) : $attributes->get($this->getAttributeKey((string) $num) ?? (string) $num);
+							$value = $this->hasCustomHydrateAttribute(
+								(string) $num,
+								$attributes,
+							) ? $this->callHydrateAttribute(
+								(string) $num,
+								$attributes,
+								$entity,
+							) : $attributes->get(
+								$this->getAttributeKey((string) $num) ?? (string) $num,
+							);
 
 							$data[(string) $num] = $value;
 						}
@@ -821,7 +843,7 @@ abstract class Hydrator
 
 				$data['entity'] = $className;
 			}
-		} catch (Throwable $ex) {
+		} catch (Throwable) {
 			// Nothing to do here
 		}
 
@@ -853,15 +875,13 @@ abstract class Hydrator
 	/**
 	 * Check if hydrator has custom attribute hydration method
 	 *
-	 * @param string $attributeKey
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return bool
 	 */
 	private function hasCustomHydrateAttribute(
 		string $attributeKey,
-		JsonAPIDocument\Objects\IStandardObject $attributes
-	): bool {
+		JsonAPIDocument\Objects\IStandardObject $attributes,
+	): bool
+	{
 		$method = $this->methodForAttribute($attributeKey);
 
 		if ($method === '' || !method_exists($this, $method)) {
@@ -878,10 +898,6 @@ abstract class Hydrator
 	 *
 	 * If this method returns an empty value, or a value that is not callable, hydration
 	 * of the the relationship will be skipped
-	 *
-	 * @param string $key
-	 *
-	 * @return string
 	 */
 	private function methodForAttribute(string $key): string
 	{
@@ -890,10 +906,6 @@ abstract class Hydrator
 
 	/**
 	 * Gets the upper camel case form of a string.
-	 *
-	 * @param string $value
-	 *
-	 * @return string
 	 */
 	private function classify(string $value): string
 	{
@@ -905,19 +917,16 @@ abstract class Hydrator
 	/**
 	 * Hydrate a attribute by invoking a method on this hydrator.
 	 *
-	 * @param string $attributeKey
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 * @param object|null $entity
-	 *
-	 * @return mixed|null
 	 *
 	 * @phpstan-param T|null $entity
 	 */
 	private function callHydrateAttribute(
 		string $attributeKey,
 		JsonAPIDocument\Objects\IStandardObject $attributes,
-		?object $entity = null
-	) {
+		object|null $entity = null,
+	): mixed
+	{
 		$method = $this->methodForAttribute($attributeKey);
 
 		if ($method === '' || !method_exists($this, $method)) {
@@ -934,21 +943,20 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships
-	 * @param Hydrators\Fields\IField[] $entityMapping
+	 * @param Array<Hydrators\Fields\IField> $entityMapping
 	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 * @param object|null $entity
 	 *
-	 * @return mixed[]
+	 * @return Array<mixed>
 	 *
 	 * @phpstan-param T|null $entity
 	 */
 	protected function hydrateRelationships(
 		JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships,
 		array $entityMapping,
-		?JsonAPIDocument\Objects\IResourceObjectCollection $included = null,
-		?object $entity = null
-	): array {
+		JsonAPIDocument\Objects\IResourceObjectCollection|null $included = null,
+		object|null $entity = null,
+	): array
+	{
 		$data = [];
 
 		foreach ($entityMapping as $field) {
@@ -961,7 +969,7 @@ abstract class Hydrator
 						$field->getMappedName(),
 						$relationship,
 						$included,
-						$entity
+						$entity,
 					);
 
 					if ($result !== null) {
@@ -976,7 +984,7 @@ abstract class Hydrator
 							$field,
 							$relationship,
 							$entity,
-							$entityMapping
+							$entityMapping,
 						);
 
 						$data[$field->getFieldName()] = $relationshipEntity;
@@ -986,7 +994,7 @@ abstract class Hydrator
 							$field,
 							$relationship,
 							$entity,
-							$entityMapping
+							$entityMapping,
 						);
 
 						$data[$field->getFieldName()] = $relationshipEntities;
@@ -998,7 +1006,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
 							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
-						]
+						],
 					);
 				}
 			}
@@ -1010,21 +1018,19 @@ abstract class Hydrator
 	/**
 	 * Hydrate a relationship by invoking a method on this hydrator.
 	 *
-	 * @param string $relationshipKey
-	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
 	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 * @param object|null $entity
 	 *
-	 * @return mixed[]|object|null
+	 * @return Array<mixed>|object|null
 	 *
 	 * @phpstan-param T|null $entity
 	 */
 	private function callHydrateRelationship(
 		string $relationshipKey,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
-		?JsonAPIDocument\Objects\IResourceObjectCollection $included = null,
-		?object $entity = null
-	) {
+		JsonAPIDocument\Objects\IResourceObjectCollection|null $included = null,
+		object|null $entity = null,
+	): array|object|null
+	{
 		$method = $this->methodForRelationship($relationshipKey);
 
 		if ($method === '' || !method_exists($this, $method)) {
@@ -1036,15 +1042,13 @@ abstract class Hydrator
 		if (is_callable($callable)) {
 			$result = call_user_func($callable, $relationship, $included, $entity);
 
-			if (
-				$result === null
-				|| is_array($result)
-				|| is_object($result)
-			) {
+			if ($result === null || is_array($result) || is_object($result)) {
 				return $result;
 			}
 
-			throw new Exceptions\InvalidStateException(sprintf('Relationship have to be an array or entity instance, %s provided.', gettype($result)));
+			throw new Exceptions\InvalidState(
+				sprintf('Relationship have to be an array or entity instance, %s provided.', gettype($result)),
+			);
 		}
 
 		return null;
@@ -1055,10 +1059,6 @@ abstract class Hydrator
 	 *
 	 * If this method returns an empty value, or a value that is not callable, hydration
 	 * of the the relationship will be skipped
-	 *
-	 * @param string $key
-	 *
-	 * @return string
 	 */
 	private function methodForRelationship(string $key): string
 	{
@@ -1068,12 +1068,7 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-one relationship
 	 *
-	 * @param Hydrators\Fields\IField $field
-	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
-	 * @param object|null $entity
-	 * @param Hydrators\Fields\IField[] $entityMapping
-	 *
-	 * @return object|null
+	 * @param Array<Hydrators\Fields\IField> $entityMapping
 	 *
 	 * @phpstan-param T|null $entity
 	 *
@@ -1082,9 +1077,10 @@ abstract class Hydrator
 	protected function hydrateHasOne(
 		Hydrators\Fields\IField $field,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
-		?object $entity,
-		array $entityMapping
-	): ?object {
+		object|null $entity,
+		array $entityMapping,
+	): object|null
+	{
 		// Find relationship field
 		if (
 			$field instanceof Hydrators\Fields\EntityField
@@ -1096,7 +1092,6 @@ abstract class Hydrator
 
 					if ($relationEntity !== null) {
 						return $relationEntity;
-
 					} elseif ($entity === null && $field->isRequired()) {
 						$this->errors->addError(
 							StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
@@ -1104,7 +1099,7 @@ abstract class Hydrator
 							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 							[
 								'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
-							]
+							],
 						);
 					}
 				} elseif ($entity === null && $field->isRequired()) {
@@ -1114,7 +1109,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
 							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
-						]
+						],
 					);
 				}
 			}
@@ -1124,17 +1119,13 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param string $entityClassName
-	 * @param JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
-	 *
-	 * @return object|null
-	 *
 	 * @phpstan-return T|null
 	 */
 	private function findRelated(
 		string $entityClassName,
-		JsonAPIDocument\Objects\IResourceIdentifierObject $identifier
-	): ?object {
+		JsonAPIDocument\Objects\IResourceIdentifierObject $identifier,
+	): object|null
+	{
 		if ($identifier->getId() === null || !Uuid\Uuid::isValid($identifier->getId())) {
 			return null;
 		}
@@ -1160,12 +1151,9 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-many relationship
 	 *
-	 * @param Hydrators\Fields\IField $field
-	 * @param JsonAPIDocument\Objects\IRelationshipObject $relationship
-	 * @param object|null $entity
-	 * @param Hydrators\Fields\IField[] $entityMapping
+	 * @param Array<Hydrators\Fields\IField> $entityMapping
 	 *
-	 * @return object[]
+	 * @return Array<object>
 	 *
 	 * @phpstan-param T|null $entity
 	 *
@@ -1174,9 +1162,10 @@ abstract class Hydrator
 	protected function hydrateHasMany(
 		Hydrators\Fields\IField $field,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
-		?object $entity,
-		array $entityMapping
-	): array {
+		object|null $entity,
+		array $entityMapping,
+	): array
+	{
 		$relations = [];
 
 		// Find relationship field
@@ -1202,7 +1191,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
 							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data',
-						]
+						],
 					);
 				}
 			}

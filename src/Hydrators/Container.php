@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * HydratorsContainer.php
+ * Container.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -27,39 +27,30 @@ use SplObjectStorage;
  * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  */
-class HydratorsContainer
+class Container
 {
 
 	/** @var SplObjectStorage<Hydrator, null> */
 	private SplObjectStorage $hydrators;
 
-	/** @var DI\Container */
-	private DI\Container $container;
-
-	/** @var Log\LoggerInterface */
 	private Log\LoggerInterface $logger;
 
-	/** @var JsonApi\JsonApiSchemaContainer|null */
-	private ?JsonApi\JsonApiSchemaContainer $jsonApiSchemaContainer = null;
+	private JsonApi\SchemaContainer|null $jsonApiSchemaContainer = null;
 
 	public function __construct(
-		DI\Container $container,
-		?Log\LoggerInterface $logger = null
-	) {
-		$this->container = $container;
+		private DI\Container $container,
+		Log\LoggerInterface|null $logger = null,
+	)
+	{
 		$this->logger = $logger ?? new Log\NullLogger();
 
 		$this->hydrators = new SplObjectStorage();
 	}
 
 	/**
-	 * @param JsonAPIDocument\IDocument $document
-	 *
-	 * @return Hydrator|null
-	 *
 	 * @phpstan-return Hydrator|null
 	 */
-	public function findHydrator(JsonAPIDocument\IDocument $document): ?Hydrator
+	public function findHydrator(JsonAPIDocument\IDocument $document): Hydrator|null
 	{
 		$this->hydrators->rewind();
 
@@ -73,12 +64,12 @@ class HydratorsContainer
 		}
 
 		$this->logger->debug('Hydrator for given document was not found', [
-			'source'   => 'hydrators-container',
-			'type'     => 'find-hydrator',
+			'source' => 'hydrators-container',
+			'type' => 'find-hydrator',
 			'document' => [
 				'type' => $document->getResource()
 					->getType(),
-				'id'   => $document->getResource()
+				'id' => $document->getResource()
 					->getId(),
 			],
 		]);
@@ -87,10 +78,6 @@ class HydratorsContainer
 	}
 
 	/**
-	 * @param Hydrator $hydrator
-	 *
-	 * @return void
-	 *
 	 * @phpstan-param Hydrator $hydrator
 	 */
 	public function add(Hydrator $hydrator): void
@@ -100,16 +87,13 @@ class HydratorsContainer
 		}
 	}
 
-	/**
-	 * @return JsonApi\JsonApiSchemaContainer
-	 */
-	private function getSchemaContainer(): JsonApi\JsonApiSchemaContainer
+	private function getSchemaContainer(): JsonApi\SchemaContainer
 	{
 		if ($this->jsonApiSchemaContainer !== null) {
 			return $this->jsonApiSchemaContainer;
 		}
 
-		$this->jsonApiSchemaContainer = $this->container->getByType(JsonApi\JsonApiSchemaContainer::class);
+		$this->jsonApiSchemaContainer = $this->container->getByType(JsonApi\SchemaContainer::class);
 
 		return $this->jsonApiSchemaContainer;
 	}

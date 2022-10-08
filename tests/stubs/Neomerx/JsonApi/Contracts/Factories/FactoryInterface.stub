@@ -9,8 +9,6 @@ interface FactoryInterface
 
 	/**
 	 * @param iterable<string, mixed> $schemas
-	 *
-	 * @return SchemaContainerInterface
 	 */
 	public function createSchemaContainer(iterable $schemas): SchemaContainerInterface;
 

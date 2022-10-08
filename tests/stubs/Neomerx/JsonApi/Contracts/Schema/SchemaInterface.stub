@@ -10,14 +10,11 @@ interface SchemaInterface
 
 	/**
 	 * @param T $resource
-	 *
-	 * @return string|null
 	 */
-	public function getId($resource): ?string;
+	public function getId($resource): string|null;
 
 	/**
 	 * @param T $resource
-	 * @param ContextInterface $context
 	 *
 	 * @return iterable<string, mixed>
 	 */
@@ -25,7 +22,6 @@ interface SchemaInterface
 
 	/**
 	 * @param T $resource
-	 * @param ContextInterface $context
 	 *
 	 * @return iterable<string, mixed>
 	 */
@@ -33,8 +29,6 @@ interface SchemaInterface
 
 	/**
 	 * @param T $resource
-	 *
-	 * @return LinkInterface
 	 */
 	public function getSelfLink($resource): LinkInterface;
 
@@ -47,46 +41,32 @@ interface SchemaInterface
 
 	/**
 	 * @param T $resource
-	 * @param string $name
-	 *
-	 * @return LinkInterface
 	 */
 	public function getRelationshipSelfLink($resource, string $name): LinkInterface;
 
 	/**
 	 * @param T $resource
-	 * @param string $name
-	 *
-	 * @return LinkInterface
 	 */
 	public function getRelationshipRelatedLink($resource, string $name): LinkInterface;
 
 	/**
 	 * @param T $resource
-	 *
-	 * @return bool
 	 */
 	public function hasIdentifierMeta($resource): bool;
 
 	/**
 	 * @param T $resource
-	 *
-	 * @return mixed
 	 */
-	public function getIdentifierMeta($resource);
+	public function getIdentifierMeta($resource): mixed;
 
 	/**
 	 * @param T $resource
-	 *
-	 * @return bool
 	 */
 	public function hasResourceMeta($resource): bool;
 
 	/**
 	 * @param T $resource
-	 *
-	 * @return mixed
 	 */
-	public function getResourceMeta($resource);
+	public function getResourceMeta($resource): mixed;
 
 }

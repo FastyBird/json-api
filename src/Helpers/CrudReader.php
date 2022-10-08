@@ -30,27 +30,18 @@ use ReflectionProperty;
 class CrudReader
 {
 
-	/** @var Common\Annotations\Reader */
 	private Common\Annotations\Reader $annotationReader;
 
-	public function __construct(
-		?Common\Cache\Cache $cache = null
-	) {
-		if ($cache !== null) {
-			$this->annotationReader = new Common\Annotations\PsrCachedReader(
-				new Common\Annotations\AnnotationReader(),
-				Common\Cache\Psr6\CacheAdapter::wrap($cache)
-			);
-
-		} else {
-			$this->annotationReader = new Common\Annotations\AnnotationReader();
-		}
+	public function __construct(Common\Cache\Cache|null $cache = null)
+	{
+		$this->annotationReader = $cache !== null ? new Common\Annotations\PsrCachedReader(
+			new Common\Annotations\AnnotationReader(),
+			Common\Cache\Psr6\CacheAdapter::wrap($cache),
+		) : new Common\Annotations\AnnotationReader();
 	}
 
 	/**
-	 * @param ReflectionProperty $rp
-	 *
-	 * @return bool[]
+	 * @return Array<bool>
 	 */
 	public function read(ReflectionProperty $rp): array
 	{

@@ -28,34 +28,25 @@ use IPub\JsonAPIDocument;
 final class MixedField extends Field
 {
 
-	/** @var bool */
-	private bool $isNullable;
-
 	public function __construct(
-		bool $isNullable,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return mixed|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes)
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): mixed
 	{
 		return $attributes->get($this->getMappedName());
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;

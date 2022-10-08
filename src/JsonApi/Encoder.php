@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * JsonApiEncoder.php
+ * Encoder.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -15,7 +15,7 @@
 
 namespace FastyBird\JsonApi\JsonApi;
 
-use Neomerx\JsonApi\Encoder;
+use Neomerx\JsonApi\Encoder as NeomerxEncoder;
 
 /**
  * Extended Json:API encoder
@@ -25,15 +25,15 @@ use Neomerx\JsonApi\Encoder;
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-class JsonApiEncoder extends Encoder\Encoder
+class Encoder extends NeomerxEncoder\Encoder
 {
 
 	/**
 	 * @param object|iterable<mixed>|null $data
 	 *
-	 * @return mixed[]
+	 * @return Array<mixed>
 	 */
-	public function encodeDataAsArray($data): array
+	public function encodeDataAsArray(object|iterable|null $data): array
 	{
 		return $this->encodeDataToArray($data);
 	}

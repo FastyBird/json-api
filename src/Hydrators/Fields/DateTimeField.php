@@ -18,6 +18,7 @@ namespace FastyBird\JsonApi\Hydrators\Fields;
 use DateTimeInterface;
 use IPub\JsonAPIDocument;
 use Nette\Utils;
+use function is_scalar;
 
 /**
  * Entity datetime field
@@ -30,27 +31,21 @@ use Nette\Utils;
 final class DateTimeField extends Field
 {
 
-	/** @var bool */
-	private bool $isNullable;
-
 	public function __construct(
-		bool $isNullable,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
-	 * @return DateTimeInterface|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): ?DateTimeInterface
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): DateTimeInterface|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
@@ -65,9 +60,6 @@ final class DateTimeField extends Field
 		return null;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;

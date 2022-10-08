@@ -28,27 +28,23 @@ use IPub\JsonAPIDocument;
 final class ArrayField extends Field
 {
 
-	/** @var bool */
-	private bool $isNullable;
-
 	public function __construct(
-		bool $isNullable,
+		private bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
-		bool $isWritable
-	) {
+		bool $isWritable,
+	)
+	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->isNullable = $isNullable;
 	}
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
-	 * @return mixed[]|null
+	 * @return Array<mixed>|null
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): ?array
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): array|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
@@ -59,9 +55,6 @@ final class ArrayField extends Field
 		return $value === null ? ($this->isNullable ? [] : null) : (array) $value;
 	}
 
-	/**
-	 * @return bool
-	 */
 	public function isNullable(): bool
 	{
 		return $this->isNullable;
