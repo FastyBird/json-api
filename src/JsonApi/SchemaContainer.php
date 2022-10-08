@@ -43,7 +43,7 @@ class SchemaContainer extends JsonApi\Schema\SchemaContainer
 	}
 
 	/**
-	 * @phpstan-template T of Schemas\JsonApi
+	 * @template T of Schemas\JsonApi
 	 * @phpstan-param    T $schema
 	 */
 	public function add(Schemas\JsonApi $schema): void

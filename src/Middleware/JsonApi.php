@@ -51,8 +51,8 @@ class JsonApi implements Server\MiddlewareInterface
 	private Log\LoggerInterface $logger;
 
 	public function __construct(
-		private Message\ResponseFactoryInterface $responseFactory,
-		private DI\Container $container,
+		private readonly Message\ResponseFactoryInterface $responseFactory,
+		private readonly DI\Container $container,
 		Log\LoggerInterface|null $logger = null,
 	)
 	{

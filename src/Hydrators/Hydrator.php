@@ -55,8 +55,8 @@ use function is_object;
 use function is_string;
 use function method_exists;
 use function sprintf;
+use function str_contains;
 use function str_replace;
-use function strpos;
 use function strtolower;
 use function trim;
 use function ucfirst;
@@ -65,7 +65,7 @@ use function ucwords;
 /**
  * Entity hydrator
  *
- * @phpstan-template T of object
+ * @template T of object
  *
  * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
@@ -142,9 +142,9 @@ abstract class Hydrator
 	private Exceptions\JsonApiMultipleError $errors;
 
 	public function __construct(
-		private Persistence\ManagerRegistry $managerRegistry,
+		private readonly Persistence\ManagerRegistry $managerRegistry,
 		protected Localization\Translator $translator,
-		private Helpers\CrudReader|null $crudReader = null,
+		private readonly Helpers\CrudReader|null $crudReader = null,
 		Common\Cache\Cache|null $cache = null,
 	)
 	{
@@ -242,7 +242,7 @@ abstract class Hydrator
 	abstract public function getEntityName(): string;
 
 	/**
-	 * @return Array<Hydrators\Fields\IField>
+	 * @return Array<Hydrators\Fields\Field>
 	 *
 	 * @phpstan-param class-string $entityClassName
 	 */
@@ -429,15 +429,13 @@ abstract class Hydrator
 
 				$typesFound = 0;
 
-				if (strpos($varAnnotation, '|') !== false) {
+				if (str_contains($varAnnotation, '|')) {
 					$varDatatypes = explode('|', $varAnnotation);
 					$varDatatypes = array_unique($varDatatypes);
 
 				} else {
 					$varDatatypes = [$varAnnotation];
 				}
-
-				$className = null;
 
 				foreach ($varDatatypes as $varDatatype) {
 					if (class_exists($varDatatype) || interface_exists($varDatatype)) {
@@ -713,12 +711,11 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 * @param Array<Hydrators\Fields\IField> $entityMapping
-	 *
-	 * @return Array<mixed>
-	 *
+	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @phpstan-param Array<Hydrators\Fields\Field> $entityMapping
 	 * @phpstan-param T|null $entity
+	 *
+	 * @phpstan-return Array<mixed>
 	 */
 	protected function hydrateAttributes(
 		string $className,
@@ -879,7 +876,7 @@ abstract class Hydrator
 	/**
 	 * Check if hydrator has custom attribute hydration method
 	 *
-	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	private function hasCustomHydrateAttribute(
 		string $attributeKey,
@@ -921,8 +918,7 @@ abstract class Hydrator
 	/**
 	 * Hydrate a attribute by invoking a method on this hydrator.
 	 *
-	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 *
+	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 * @phpstan-param T|null $entity
 	 */
 	private function callHydrateAttribute(
@@ -947,12 +943,11 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @param Array<Hydrators\Fields\IField> $entityMapping
-	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 *
-	 * @return Array<mixed>
-	 *
+	 * @phpstan-param Array<Hydrators\Fields\Field> $entityMapping
+	 * @phpstan-param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
 	 * @phpstan-param T|null $entity
+	 *
+	 * @phpstan-return  Array<mixed>
 	 */
 	protected function hydrateRelationships(
 		JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships,
@@ -1022,11 +1017,10 @@ abstract class Hydrator
 	/**
 	 * Hydrate a relationship by invoking a method on this hydrator.
 	 *
-	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 *
-	 * @return Array<mixed>|object|null
-	 *
+	 * @phpstan-param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
 	 * @phpstan-param T|null $entity
+	 *
+	 * @phpstan-return  Array<mixed>|object|null
 	 */
 	private function callHydrateRelationship(
 		string $relationshipKey,
@@ -1072,14 +1066,14 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-one relationship
 	 *
-	 * @param Array<Hydrators\Fields\IField> $entityMapping
+	 * @param Array<Hydrators\Fields\Field> $entityMapping
 	 *
 	 * @phpstan-param T|null $entity
 	 *
 	 * @phpstan-return T|null
 	 */
 	protected function hydrateHasOne(
-		Hydrators\Fields\IField $field,
+		Hydrators\Fields\Field $field,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
 		object|null $entity,
 		array $entityMapping,
@@ -1155,7 +1149,7 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-many relationship
 	 *
-	 * @param Array<Hydrators\Fields\IField> $entityMapping
+	 * @param Array<Hydrators\Fields\Field> $entityMapping
 	 *
 	 * @return Array<object>
 	 *
@@ -1164,7 +1158,7 @@ abstract class Hydrator
 	 * @phpstan-return Array<int, T>
 	 */
 	protected function hydrateHasMany(
-		Hydrators\Fields\IField $field,
+		Hydrators\Fields\Field $field,
 		JsonAPIDocument\Objects\IRelationshipObject $relationship,
 		object|null $entity,
 		array $entityMapping,

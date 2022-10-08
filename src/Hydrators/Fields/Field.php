@@ -15,6 +15,7 @@
 
 namespace FastyBird\JsonApi\Hydrators\Fields;
 
+use IPub\JsonAPIDocument;
 use Nette;
 
 /**
@@ -25,19 +26,24 @@ use Nette;
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-abstract class Field implements IField
+abstract class Field
 {
 
 	use Nette\SmartObject;
 
 	public function __construct(
-		private string $mappedName,
-		private string $fieldName,
-		private bool $isRequired,
-		private bool $isWritable,
+		private readonly string $mappedName,
+		private readonly string $fieldName,
+		private readonly bool $isRequired,
+		private readonly bool $isWritable,
 	)
 	{
 	}
+
+	/**
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 */
+	abstract public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): mixed;
 
 	public function getMappedName(): string
 	{

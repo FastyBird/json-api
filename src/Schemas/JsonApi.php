@@ -63,7 +63,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	public function getLinks($resource): iterable
 	{
 		return [
-			Contracts\Schema\LinkInterface::SELF => $this->getSelfLink($resource),
+			Contracts\Schema\BaseLinkInterface::SELF => $this->getSelfLink($resource),
 		];
 	}
 

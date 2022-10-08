@@ -38,7 +38,7 @@ class Container
 	private JsonApi\SchemaContainer|null $jsonApiSchemaContainer = null;
 
 	public function __construct(
-		private DI\Container $container,
+		private readonly DI\Container $container,
 		Log\LoggerInterface|null $logger = null,
 	)
 	{

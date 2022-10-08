@@ -29,7 +29,7 @@ final class BooleanField extends Field
 {
 
 	public function __construct(
-		private bool $isNullable,
+		private readonly bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,

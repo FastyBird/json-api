@@ -35,9 +35,9 @@ class JsonApiError extends PHPException implements Exception, JsonApi
 	public function __construct(
 		int $code,
 		string $title,
-		private string|null $detail = null,
-		private array|null $source = null,
-		private string|null $type = null,
+		private readonly string|null $detail = null,
+		private readonly array|null $source = null,
+		private readonly string|null $type = null,
 	)
 	{
 		parent::__construct($title, $code);

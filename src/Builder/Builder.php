@@ -32,8 +32,8 @@ use function http_build_query;
 use function is_array;
 use function round;
 use function str_replace;
+use function str_starts_with;
 use function strval;
-use function substr;
 use const JSON_PRETTY_PRINT;
 
 /**
@@ -63,9 +63,9 @@ class Builder
 	 * @param string|Array<string> $metaAuthor
 	 */
 	public function __construct(
-		private DI\Container $container,
-		private string|array $metaAuthor,
-		private string|null $metaCopyright = null,
+		private readonly DI\Container $container,
+		private readonly string|array $metaAuthor,
+		private readonly string|null $metaCopyright = null,
 	)
 	{
 	}
@@ -218,7 +218,7 @@ class Builder
 		$result = '';
 
 		// Add a leading slash if necessary.
-		if (substr($uri->getPath(), 0, 1) !== '/') {
+		if (!str_starts_with($uri->getPath(), '/')) {
 			$result .= '/';
 		}
 

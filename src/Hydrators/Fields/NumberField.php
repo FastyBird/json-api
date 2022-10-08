@@ -30,8 +30,8 @@ final class NumberField extends Field
 {
 
 	public function __construct(
-		private bool $isDecimal,
-		private bool $isNullable,
+		private readonly bool $isDecimal,
+		private readonly bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
@@ -42,7 +42,7 @@ final class NumberField extends Field
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @phpstan-param  JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): float|int|null
 	{

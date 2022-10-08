@@ -32,8 +32,8 @@ final class EnumField extends Field
 {
 
 	public function __construct(
-		private string $typeClass,
-		private bool $isNullable,
+		private readonly string $typeClass,
+		private readonly bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
@@ -44,7 +44,7 @@ final class EnumField extends Field
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): Consistence\Enum\Enum|null
 	{

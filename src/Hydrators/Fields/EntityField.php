@@ -34,9 +34,9 @@ abstract class EntityField extends Field
 	 */
 	public function __construct(
 		string $className,
-		private bool $nullable,
+		private readonly bool $nullable,
 		string $mappedName,
-		private bool $isRelationship,
+		private readonly bool $isRelationship,
 		string $fieldName,
 		bool $isRequired,
 		bool $isWritable,

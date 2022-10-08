@@ -29,7 +29,7 @@ final class MixedField extends Field
 {
 
 	public function __construct(
-		private bool $isNullable,
+		private readonly bool $isNullable,
 		string $mappedName,
 		string $fieldName,
 		bool $isRequired,
@@ -40,7 +40,7 @@ final class MixedField extends Field
 	}
 
 	/**
-	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): mixed
 	{

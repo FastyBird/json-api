@@ -3,6 +3,8 @@
 The purpose of this extension is to provide layer for parsing and handling [{JSON:API}](https://jsonapi.org/) requests
 and responses
 
+***
+
 ## Installation
 
 The best way to install **fastybird/json-api** is using [Composer](http://getcomposer.org/):
