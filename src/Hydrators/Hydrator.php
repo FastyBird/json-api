@@ -705,6 +705,10 @@ abstract class Hydrator
 			}
 		}
 
+		if ($name === 'var' && $rp->getType() !== null) {
+			return $rp->getType()->getName();
+		}
+
 		return null;
 	}
 
