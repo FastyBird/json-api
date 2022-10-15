@@ -98,7 +98,7 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var Array<mixed>
+	 * @var Array<int|string, string>
 	 */
 	protected array $attributes = [];
 
@@ -117,7 +117,7 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var Array<mixed>
+	 * @var Array<int|string, string>
 	 */
 	protected array $compositedAttributes = [];
 
@@ -128,13 +128,13 @@ abstract class Hydrator
 	 */
 	protected array $relationships = [];
 
-	/** @var Array<mixed>|null */
+	/** @var Array<string, string>|null */
 	private array|null $normalizedAttributes = null;
 
-	/** @var Array<mixed>|null */
+	/** @var Array<string, string>|null */
 	private array|null $normalizedCompositedAttributes = null;
 
-	/** @var Array<mixed>|null */
+	/** @var Array<string, string>|null */
 	private array|null $normalizedRelationships = null;
 
 	private Common\Annotations\Reader $annotationReader;
