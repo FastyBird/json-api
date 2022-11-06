@@ -175,7 +175,7 @@ abstract class Hydrator
 				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.heading'),
 				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.message'),
 				[
-					'pointer' => 'data',
+					'pointer' => '/data',
 				],
 			);
 		}
@@ -221,7 +221,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.heading'),
 						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.message'),
 						[
-							'pointer' => 'data/id',
+							'pointer' => '/data/id',
 						],
 					);
 				}
@@ -753,7 +753,7 @@ abstract class Hydrator
 					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.heading'),
 					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.message'),
 					[
-						'pointer' => 'data/attributes/' . $field->getMappedName(),
+						'pointer' => '/data/attributes/' . $field->getMappedName(),
 					],
 				);
 
@@ -1004,7 +1004,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
-							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
+							'pointer' => '/data/relationships/' . $field->getMappedName() . '/data/id',
 						],
 					);
 				}
@@ -1096,7 +1096,7 @@ abstract class Hydrator
 							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 							[
-								'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
+								'pointer' => '/data/relationships/' . $field->getMappedName() . '/data/id',
 							],
 						);
 					}
@@ -1106,7 +1106,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
-							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data/id',
+							'pointer' => '/data/relationships/' . $field->getMappedName() . '/data/id',
 						],
 					);
 				}
@@ -1188,7 +1188,7 @@ abstract class Hydrator
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
 						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
 						[
-							'pointer' => 'data/relationships/' . $field->getMappedName() . '/data',
+							'pointer' => '/data/relationships/' . $field->getMappedName() . '/data',
 						],
 					);
 				}
