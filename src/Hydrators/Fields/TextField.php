@@ -41,7 +41,7 @@ final class TextField extends Field
 	}
 
 	/**
-	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): string|null
 	{

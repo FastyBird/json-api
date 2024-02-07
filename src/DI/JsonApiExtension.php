@@ -40,15 +40,15 @@ class JsonApiExtension extends DI\CompilerExtension
 {
 
 	public static function register(
-		Nette\Configurator $config,
+		Nette\Bootstrap\Configurator $config,
 		string $extensionName = 'fbJsonApi',
 	): void
 	{
 		$config->onCompile[] = static function (
-			Nette\Configurator $config,
+			Nette\Bootstrap\Configurator $config,
 			DI\Compiler $compiler,
 		) use ($extensionName): void {
-			$compiler->addExtension($extensionName, new JsonApiExtension());
+			$compiler->addExtension($extensionName, new self());
 		};
 	}
 
@@ -91,6 +91,9 @@ class JsonApiExtension extends DI\CompilerExtension
 		}
 	}
 
+	/**
+	 * @throws DI\MissingServiceException
+	 */
 	public function beforeCompile(): void
 	{
 		parent::beforeCompile();
@@ -103,15 +106,13 @@ class JsonApiExtension extends DI\CompilerExtension
 
 		$schemaContainerServiceName = $builder->getByType(JsonApi\SchemaContainer::class, true);
 
-		if ($schemaContainerServiceName !== null) {
-			$schemaContainerService = $builder->getDefinition($schemaContainerServiceName);
-			assert($schemaContainerService instanceof DI\Definitions\ServiceDefinition);
+		$schemaContainerService = $builder->getDefinition($schemaContainerServiceName);
+		assert($schemaContainerService instanceof DI\Definitions\ServiceDefinition);
 
-			$schemasServices = $builder->findByType(Schemas\JsonApi::class);
+		$schemasServices = $builder->findByType(Schemas\JsonApi::class);
 
-			foreach ($schemasServices as $schemasService) {
-				$schemaContainerService->addSetup('add', [$schemasService]);
-			}
+		foreach ($schemasServices as $schemasService) {
+			$schemaContainerService->addSetup('add', [$schemasService]);
 		}
 
 		/**
@@ -120,15 +121,13 @@ class JsonApiExtension extends DI\CompilerExtension
 
 		$hydratorContainerServiceName = $builder->getByType(Hydrators\Container::class, true);
 
-		if ($hydratorContainerServiceName !== null) {
-			$hydratorContainerService = $builder->getDefinition($hydratorContainerServiceName);
-			assert($hydratorContainerService instanceof DI\Definitions\ServiceDefinition);
+		$hydratorContainerService = $builder->getDefinition($hydratorContainerServiceName);
+		assert($hydratorContainerService instanceof DI\Definitions\ServiceDefinition);
 
-			$hydratorsServices = $builder->findByType(Hydrators\Hydrator::class);
+		$hydratorsServices = $builder->findByType(Hydrators\Hydrator::class);
 
-			foreach ($hydratorsServices as $hydratorService) {
-				$hydratorContainerService->addSetup('add', [$hydratorService]);
-			}
+		foreach ($hydratorsServices as $hydratorService) {
+			$hydratorContainerService->addSetup('add', [$hydratorService]);
 		}
 	}
 

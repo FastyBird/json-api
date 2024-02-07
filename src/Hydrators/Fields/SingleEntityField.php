@@ -35,6 +35,8 @@ final class SingleEntityField extends EntityField
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
 	 * @return Array<mixed>|null
+	 *
+	 * @throws Exceptions\InvalidState
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): array|null
 	{

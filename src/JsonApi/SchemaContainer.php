@@ -44,7 +44,8 @@ class SchemaContainer extends JsonApi\Schema\SchemaContainer
 
 	/**
 	 * @template T of Schemas\JsonApi
-	 * @phpstan-param    T $schema
+	 *
+	 * @param T $schema
 	 */
 	public function add(Schemas\JsonApi $schema): void
 	{
@@ -53,6 +54,9 @@ class SchemaContainer extends JsonApi\Schema\SchemaContainer
 		$this->setCreatedProvider($schema->getEntityClass(), $schema);
 	}
 
+	/**
+	 * @throws Exceptions\InvalidState
+	 */
 	public function getSchemaByClassName(string $resourceType): Schemas\JsonApi
 	{
 		$schema = $this->getSchemaByType($resourceType);
@@ -61,7 +65,7 @@ class SchemaContainer extends JsonApi\Schema\SchemaContainer
 			return $schema;
 		}
 
-		throw new Exceptions\InvalidState('');
+		throw new Exceptions\InvalidState('Schema for given resource could not be loaded');
 	}
 
 	/**

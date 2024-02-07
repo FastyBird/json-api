@@ -26,14 +26,11 @@ namespace FastyBird\JsonApi\Hydrators\Fields;
 abstract class EntityField extends Field
 {
 
-	/** @phpstan-var class-string */
-	private string $className;
-
 	/**
-	 * @phpstan-param class-string $className
+	 * @param class-string $className
 	 */
 	public function __construct(
-		string $className,
+		private string $className,
 		private readonly bool $nullable,
 		string $mappedName,
 		private readonly bool $isRelationship,
@@ -43,12 +40,10 @@ abstract class EntityField extends Field
 	)
 	{
 		parent::__construct($mappedName, $fieldName, $isRequired, $isWritable);
-
-		$this->className = $className;
 	}
 
 	/**
-	 * @phpstan-return class-string
+	 * @return class-string
 	 */
 	public function getClassName(): string
 	{

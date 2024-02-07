@@ -40,7 +40,6 @@ use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_unique;
-use function assert;
 use function call_user_func;
 use function class_exists;
 use function count;
@@ -98,7 +97,7 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var Array<int|string, string>
+	 * @var array<int|string, string>
 	 */
 	protected array $attributes = [];
 
@@ -117,30 +116,33 @@ abstract class Hydrator
 	 * Will transfer the `foo` resource attribute to the model `foo` attribute, and the
 	 * resource `bar` attribute to the model `baz` attribute.
 	 *
-	 * @var Array<int|string, string>
+	 * @var array<int|string, string>
 	 */
 	protected array $compositedAttributes = [];
 
 	/**
 	 * Resource relationship keys that should be automatically hydrated
 	 *
-	 * @var Array<string>
+	 * @var array<string>
 	 */
 	protected array $relationships = [];
 
-	/** @var Array<string, string>|null */
+	/** @var array<string, string>|null */
 	private array|null $normalizedAttributes = null;
 
-	/** @var Array<string, string>|null */
+	/** @var array<string, string>|null */
 	private array|null $normalizedCompositedAttributes = null;
 
-	/** @var Array<string, string>|null */
+	/** @var array<string, string>|null */
 	private array|null $normalizedRelationships = null;
 
 	private Common\Annotations\Reader $annotationReader;
 
 	private Exceptions\JsonApiMultipleError $errors;
 
+	/**
+	 * @throws Common\Annotations\AnnotationException
+	 */
 	public function __construct(
 		private readonly Persistence\ManagerRegistry $managerRegistry,
 		protected Localization\Translator $translator,
@@ -157,10 +159,10 @@ abstract class Hydrator
 	}
 
 	/**
+	 * @param T|null $entity
+	 *
 	 * @throws Exceptions\JsonApi
 	 * @throws Throwable
-	 *
-	 * @phpstan-param T|null $entity
 	 */
 	public function hydrate(
 		JsonAPIDocument\IDocument $document,
@@ -237,14 +239,16 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @phpstan-return class-string
+	 * @return class-string<T>
 	 */
 	abstract public function getEntityName(): string;
 
 	/**
-	 * @return Array<Hydrators\Fields\Field>
+	 * @param class-string $entityClassName
 	 *
-	 * @phpstan-param class-string $entityClassName
+	 * @return array<Hydrators\Fields\Field>
+	 *
+	 * @throws Exceptions\InvalidState
 	 */
 	protected function mapEntity(string $entityClassName): array
 	{
@@ -322,15 +326,25 @@ abstract class Hydrator
 			}
 
 			// Extract all entity property annotations
-			$propertyAnnotations = array_map(
-				(static fn ($annotation): string => $annotation::class),
-				$this->annotationReader->getPropertyAnnotations($rp),
+			$propertyAnnotations = array_merge(
+				array_map(
+					(static fn ($annotation): string => $annotation::class),
+					$this->annotationReader->getPropertyAnnotations($rp),
+				),
+				array_map(
+					(static fn ($attribute): string => $attribute->getName()),
+					$rp->getAttributes(),
+				),
 			);
 
 			if (in_array(ORM\Mapping\OneToOne::class, $propertyAnnotations, true)) {
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToOne::class);
-				assert($mapping instanceof ORM\Mapping\OneToOne);
-				$className = $mapping->targetEntity;
+				$className = $mapping?->targetEntity;
+
+				if ($className === null) {
+					$attributes = $rp->getAttributes(ORM\Mapping\OneToOne::class);
+					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
+				}
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
@@ -346,8 +360,12 @@ abstract class Hydrator
 				}
 			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAnnotations, true)) {
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToMany::class);
-				assert($mapping instanceof ORM\Mapping\OneToMany);
-				$className = $mapping->targetEntity;
+				$className = $mapping?->targetEntity;
+
+				if ($className === null) {
+					$attributes = $rp->getAttributes(ORM\Mapping\OneToMany::class);
+					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
+				}
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
@@ -363,8 +381,12 @@ abstract class Hydrator
 				}
 			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAnnotations, true)) {
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToMany::class);
-				assert($mapping instanceof ORM\Mapping\ManyToMany);
-				$className = $mapping->targetEntity;
+				$className = $mapping?->targetEntity;
+
+				if ($className === null) {
+					$attributes = $rp->getAttributes(ORM\Mapping\ManyToMany::class);
+					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
+				}
 
 				// Check if class is callable
 				if ($className !== null && class_exists($className)) {
@@ -380,8 +402,12 @@ abstract class Hydrator
 				}
 			} elseif (in_array(ORM\Mapping\ManyToOne::class, $propertyAnnotations, true)) {
 				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToOne::class);
-				assert($mapping instanceof ORM\Mapping\ManyToOne);
-				$className = $mapping->targetEntity;
+				$className = $mapping?->targetEntity;
+
+				if ($className === null) {
+					$attributes = $rp->getAttributes(ORM\Mapping\ManyToOne::class);
+					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
+				}
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
@@ -711,11 +737,13 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 * @phpstan-param Array<Hydrators\Fields\Field> $entityMapping
-	 * @phpstan-param T|null $entity
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @param array<Hydrators\Fields\Field> $entityMapping
+	 * @param T|null $entity
 	 *
-	 * @phpstan-return Array<mixed>
+	 * @return array<mixed>
+	 *
+	 * @throws Exceptions\InvalidState
 	 */
 	protected function hydrateAttributes(
 		string $className,
@@ -876,7 +904,7 @@ abstract class Hydrator
 	/**
 	 * Check if hydrator has custom attribute hydration method
 	 *
-	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	private function hasCustomHydrateAttribute(
 		string $attributeKey,
@@ -898,7 +926,7 @@ abstract class Hydrator
 	 * Return the method name to call for hydrating the specific attribute.
 	 *
 	 * If this method returns an empty value, or a value that is not callable, hydration
-	 * of the the relationship will be skipped
+	 * of the relationship will be skipped
 	 */
 	private function methodForAttribute(string $key): string
 	{
@@ -918,8 +946,8 @@ abstract class Hydrator
 	/**
 	 * Hydrate a attribute by invoking a method on this hydrator.
 	 *
-	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
-	 * @phpstan-param T|null $entity
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @param T|null $entity
 	 */
 	private function callHydrateAttribute(
 		string $attributeKey,
@@ -943,11 +971,13 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @phpstan-param Array<Hydrators\Fields\Field> $entityMapping
-	 * @phpstan-param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 * @phpstan-param T|null $entity
+	 * @param array<Hydrators\Fields\Field> $entityMapping
+	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
+	 * @param T|null $entity
 	 *
-	 * @phpstan-return  Array<mixed>
+	 * @return  array<mixed>
+	 *
+	 * @throws Exceptions\InvalidState
 	 */
 	protected function hydrateRelationships(
 		JsonAPIDocument\Objects\IRelationshipObjectCollection $relationships,
@@ -1017,10 +1047,12 @@ abstract class Hydrator
 	/**
 	 * Hydrate a relationship by invoking a method on this hydrator.
 	 *
-	 * @phpstan-param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
-	 * @phpstan-param T|null $entity
+	 * @param JsonAPIDocument\Objects\IResourceObjectCollection<JsonAPIDocument\Objects\IResourceObject>|null $included
+	 * @param T|null $entity
 	 *
-	 * @phpstan-return  Array<mixed>|object|null
+	 * @return  array<mixed>|object|null
+	 *
+	 * @throws Exceptions\InvalidState
 	 */
 	private function callHydrateRelationship(
 		string $relationshipKey,
@@ -1066,11 +1098,8 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-one relationship
 	 *
-	 * @param Array<Hydrators\Fields\Field> $entityMapping
-	 *
-	 * @phpstan-param T|null $entity
-	 *
-	 * @phpstan-return T|null
+	 * @param T|null $entity
+	 * @param array<Hydrators\Fields\Field> $entityMapping
 	 */
 	protected function hydrateHasOne(
 		Hydrators\Fields\Field $field,
@@ -1117,7 +1146,7 @@ abstract class Hydrator
 	}
 
 	/**
-	 * @phpstan-return T|null
+	 * @param class-string $entityClassName
 	 */
 	private function findRelated(
 		string $entityClassName,
@@ -1135,12 +1164,9 @@ abstract class Hydrator
 		$entityManager = $this->managerRegistry->getManagerForClass($entityClassName);
 
 		if ($entityManager !== null) {
-			/** @phpstan-var T|null $entity */
-			$entity = $entityManager
+			return $entityManager
 				->getRepository($entityClassName)
 				->find($identifier->getId());
-
-			return $entity;
 		}
 
 		return null;
@@ -1149,13 +1175,10 @@ abstract class Hydrator
 	/**
 	 * Hydrate a resource has-many relationship
 	 *
-	 * @param Array<Hydrators\Fields\Field> $entityMapping
+	 * @param T|null $entity
+	 * @param array<Hydrators\Fields\Field> $entityMapping
 	 *
-	 * @return Array<object>
-	 *
-	 * @phpstan-param T|null $entity
-	 *
-	 * @phpstan-return Array<int, T>
+	 * @return array<int, object>
 	 */
 	protected function hydrateHasMany(
 		Hydrators\Fields\Field $field,

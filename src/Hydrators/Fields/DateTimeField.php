@@ -43,7 +43,7 @@ final class DateTimeField extends Field
 	}
 
 	/**
-	 * @phpstan-param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): DateTimeInterface|null
 	{

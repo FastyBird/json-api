@@ -20,6 +20,7 @@ namespace FastyBird\JsonApi\Middleware;
 use FastyBird\JsonApi\Exceptions;
 use FastyBird\JsonApi\JsonApi as Tools;
 use Fig\Http\Message\StatusCodeInterface;
+use InvalidArgumentException;
 use IPub;
 use Neomerx;
 use Neomerx\JsonApi\Contracts;
@@ -28,14 +29,11 @@ use Nette\DI;
 use Psr\Http\Message;
 use Psr\Http\Server;
 use Psr\Log;
+use RuntimeException;
 use Throwable;
 use function class_alias;
 use function class_exists;
 use const JSON_PRETTY_PRINT;
-
-if (!class_exists('IPub\SlimRouter\Exceptions\HttpException')) {
-	class_alias('IPub\SlimRouter\Exceptions\HttpException', Throwable::class);
-}
 
 /**
  * {JSON:API} formatting output handling middleware
@@ -59,6 +57,10 @@ class JsonApi implements Server\MiddlewareInterface
 		$this->logger = $logger ?? new Log\NullLogger();
 	}
 
+	/**
+	 * @throws InvalidArgumentException
+	 * @throws RuntimeException
+	 */
 	public function process(
 		Message\ServerRequestInterface $request,
 		Server\RequestHandlerInterface $handler,
@@ -85,7 +87,11 @@ class JsonApi implements Server\MiddlewareInterface
 					$response->getBody()
 						->write($content);
 				}
-			} elseif ($ex instanceof IPub\SlimRouter\Exceptions\HttpException) {
+
+			} elseif (
+				class_exists('\IPub\SlimRouter\Exceptions\HttpException')
+				&& $ex instanceof IPub\SlimRouter\Exceptions\HttpException
+			) {
 				$response = $response->withStatus($ex->getCode());
 
 				$content = $this->getEncoder()
@@ -135,6 +141,9 @@ class JsonApi implements Server\MiddlewareInterface
 			->withHeader('Content-Type', Contracts\Http\Headers\MediaTypeInterface::JSON_API_MEDIA_TYPE);
 	}
 
+	/**
+	 * @throws DI\MissingServiceException
+	 */
 	private function getEncoder(): Tools\Encoder
 	{
 		$encoder = new Tools\Encoder(

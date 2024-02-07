@@ -32,6 +32,9 @@ class CrudReader
 
 	private Common\Annotations\Reader $annotationReader;
 
+	/**
+	 * @throws Common\Annotations\AnnotationException
+	 */
 	public function __construct(Common\Cache\Cache|null $cache = null)
 	{
 		$this->annotationReader = $cache !== null ? new Common\Annotations\PsrCachedReader(
@@ -50,7 +53,16 @@ class CrudReader
 
 		/** @phpstan-ignore-next-line */
 		if (!$crud instanceof DoctrineCrud\Mapping\Annotation\Crud) {
-			return [false, false];
+			/** @phpstan-ignore-next-line */
+			$attributes = $rp->getAttributes(DoctrineCrud\Mapping\Attribute\Crud::class);
+			$crud = $attributes !== [] ? $attributes[0]->newInstance() : null;
+
+			if ($crud === null) {
+				return [false, false];
+			}
+
+			/** @phpstan-ignore-next-line */
+			return [$crud->isRequired(), $crud->isWritable()];
 		}
 
 		/** @phpstan-ignore-next-line */

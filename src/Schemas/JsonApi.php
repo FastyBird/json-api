@@ -25,7 +25,7 @@ use function property_exists;
 /**
  * Entity schema constructor
  *
- * @template   T of object
+ * @template     T of object
  * @implements   Contracts\Schema\SchemaInterface<T>
  *
  * @package            FastyBird:JsonApi!
@@ -42,9 +42,9 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	abstract public function getEntityClass(): string;
 
 	/**
-	 * @return iterable<string, mixed>
+	 * @param T $resource
 	 *
-	 * @phpstan-param T $resource
+	 * @return iterable<string, mixed>
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -54,9 +54,9 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @return iterable<string, Contracts\Schema\LinkInterface>
+	 * @param T $resource
 	 *
-	 * @phpstan-param T $resource
+	 * @return iterable<string, Contracts\Schema\LinkInterface>
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -68,7 +68,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -78,7 +78,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -88,7 +88,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * Get resources sub-URL.
+	 * Get resources sub-URL
 	 */
 	private function getResourcesSubUrl(): string
 	{
@@ -100,7 +100,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -116,7 +116,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -131,7 +131,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -144,7 +144,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -154,7 +154,9 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
+	 *
+	 * @throws Exceptions\Logic
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -164,7 +166,7 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
@@ -174,7 +176,9 @@ abstract class JsonApi implements Contracts\Schema\SchemaInterface
 	}
 
 	/**
-	 * @phpstan-param T $resource
+	 * @param T $resource
+	 *
+	 * @throws Exceptions\Logic
 	 *
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */

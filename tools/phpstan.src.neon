@@ -1,0 +1,21 @@
+includes:
+    - phpstan.base.neon
+
+parameters:
+    level: max
+
+    paths:
+        - ../src/
+
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+
+    resultCachePath: %currentWorkingDirectory%/var/tools/PHPStan/resultCache.src.php
+
+    stubFiles:
+        - ../tests/stubs/Neomerx/JsonApi/Contracts/Factories/FactoryInterface.stub
+        - ../tests/stubs/Neomerx/JsonApi/Contracts/Schema/ContextInterface.stub
+        - ../tests/stubs/Neomerx/JsonApi/Contracts/Schema/LinkInterface.stub
+        - ../tests/stubs/Neomerx/JsonApi/Contracts/Schema/SchemaContainerInterface.stub
+        - ../tests/stubs/Neomerx/JsonApi/Contracts/Schema/SchemaInterface.stub
+        - ../tests/stubs/Neomerx/JsonApi/Factories/Factory.stub

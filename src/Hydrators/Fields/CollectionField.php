@@ -32,6 +32,8 @@ final class CollectionField extends EntityField
 
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
+	 *
+	 * @throws Exceptions\InvalidState
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): mixed
 	{

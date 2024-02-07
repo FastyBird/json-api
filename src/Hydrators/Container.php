@@ -15,6 +15,7 @@
 
 namespace FastyBird\JsonApi\Hydrators;
 
+use FastyBird\JsonApi\Exceptions;
 use FastyBird\JsonApi\JsonApi;
 use IPub\JsonAPIDocument;
 use Nette\DI;
@@ -48,7 +49,8 @@ class Container
 	}
 
 	/**
-	 * @phpstan-return Hydrator|null
+	 * @throws DI\MissingServiceException
+	 * @throws Exceptions\InvalidState
 	 */
 	public function findHydrator(JsonAPIDocument\IDocument $document): Hydrator|null
 	{
@@ -77,9 +79,6 @@ class Container
 		return null;
 	}
 
-	/**
-	 * @phpstan-param Hydrator $hydrator
-	 */
 	public function add(Hydrator $hydrator): void
 	{
 		if (!$this->hydrators->contains($hydrator)) {
@@ -87,6 +86,9 @@ class Container
 		}
 	}
 
+	/**
+	 * @throws DI\MissingServiceException
+	 */
 	private function getSchemaContainer(): JsonApi\SchemaContainer
 	{
 		if ($this->jsonApiSchemaContainer !== null) {

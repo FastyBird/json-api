@@ -15,7 +15,9 @@
 
 namespace FastyBird\JsonApi\Builder;
 
+use DivisionByZeroError;
 use FastyBird\JsonApi\JsonApi;
+use InvalidArgumentException;
 use Neomerx;
 use Neomerx\JsonApi\Contracts;
 use Neomerx\JsonApi\Schema;
@@ -24,6 +26,7 @@ use Nette\Utils;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use RuntimeException;
 use function array_key_exists;
 use function array_merge;
 use function call_user_func_array;
@@ -72,6 +75,11 @@ class Builder
 
 	/**
 	 * @param object|Array<object>|null $entity
+	 * @param callable(string): bool $linkValidator
+	 *
+	 * @throws DivisionByZeroError
+	 * @throws InvalidArgumentException
+	 * @throws RuntimeException
 	 */
 	public function build(
 		ServerRequestInterface $request,
@@ -152,14 +160,13 @@ class Builder
 
 			// Try to get "self" link from encoded entity as array
 			if (
-				isset($encodedData['data'])
-				&& isset($encodedData['data']['links']) // @phpstan-ignore-line
-				&& isset($encodedData['data']['links'][self::LINK_SELF]) // @phpstan-ignore-line
+				array_key_exists('data', $encodedData)
+				&& array_key_exists('links', $encodedData['data'])
+				&& array_key_exists(self::LINK_SELF, $encodedData['data']['links'])
 			) {
 				$encoder->withLinks(array_merge($links, [
 					self::LINK_RELATED => new Schema\Link(
 						false,
-						// @phpstan-ignore-next-line
 						strval($encodedData['data']['links'][self::LINK_SELF]),
 						false,
 					),
@@ -199,6 +206,9 @@ class Builder
 			->withHeader('Content-Type', Contracts\Http\Headers\MediaTypeInterface::JSON_API_MEDIA_TYPE);
 	}
 
+	/**
+	 * @throws DI\MissingServiceException
+	 */
 	private function getEncoder(): JsonApi\Encoder
 	{
 		$encoder = new JsonApi\Encoder(
