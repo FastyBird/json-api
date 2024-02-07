@@ -3,5 +3,3 @@
 if (!defined('TEMP_DIR')) {
 	define('TEMP_DIR', 'val');
 }
-
-DG\BypassFinals::enable();

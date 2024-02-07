@@ -60,7 +60,6 @@
 
   "require-dev" : {
     "brianium/paratest": "^7.3",
-    "dg/bypass-finals": "^1.4",
     "guzzlehttp/psr7": "^2.6",
     "infection/infection": "^0.27",
     "orisai/coding-standard": "^3.2",
