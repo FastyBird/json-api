@@ -60,7 +60,6 @@
 
   "require-dev" : {
     "brianium/paratest": "^7.3",
-    "contributte/translation" : "^0.9",
     "dg/bypass-finals": "^1.4",
     "guzzlehttp/psr7": "^2.6",
     "infection/infection": "^0.27",
@@ -75,7 +74,6 @@
     "phpstan/phpstan-phpunit": "^1.1",
     "phpstan/phpstan-strict-rules": "^1.5",
     "phpunit/phpunit": "^10.0",
-    "react/http": "^1.7",
     "staabm/annotate-pull-request-from-checkstyle": "^1.8",
     "tracy/tracy": "^2.9"
   },
