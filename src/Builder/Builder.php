@@ -15,7 +15,6 @@
 
 namespace FastyBird\JsonApi\Builder;
 
-use DivisionByZeroError;
 use FastyBird\JsonApi\JsonApi;
 use InvalidArgumentException;
 use Neomerx;
@@ -77,7 +76,6 @@ class Builder
 	 * @param object|Array<object>|null $entity
 	 * @param callable(string): bool $linkValidator
 	 *
-	 * @throws DivisionByZeroError
 	 * @throws InvalidArgumentException
 	 * @throws RuntimeException
 	 */
@@ -113,7 +111,7 @@ class Builder
 				$pageLimit = null;
 			}
 
-			if ($pageOffset !== null && $pageLimit !== null) {
+			if ($pageOffset !== null && $pageLimit !== null && $pageLimit > 0) {
 				$lastPage = (int) round($totalCount / $pageLimit) * $pageLimit;
 
 				if ($lastPage === $totalCount) {

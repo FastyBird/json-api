@@ -425,6 +425,13 @@ abstract class Hydrator
 				$varAnnotation = $this->parseAnnotation($rp, 'var');
 
 				try {
+					$propertyType = $rp->getType();
+
+					if ($propertyType instanceof ReflectionNamedType) {
+						$varAnnotation = ($varAnnotation === null ? '' : $varAnnotation . '|')
+							. $propertyType->getName() . ($propertyType->allowsNull() ? '|null' : '');
+					}
+
 					$rm = $rc->getMethod('get' . ucfirst($fieldName));
 
 					$returnType = $rm->getReturnType();
