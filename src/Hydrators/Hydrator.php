@@ -541,7 +541,7 @@ abstract class Hydrator
 								);
 
 							} elseif ($typeRc->isSubclassOf(Consistence\Enum\Enum::class)) {
-								$fields[] = new Hydrators\Fields\EnumField(
+								$fields[] = new Hydrators\Fields\ConsistenceEnumField(
 									$className,
 									$isNullable,
 									$mappedKey,
@@ -552,6 +552,16 @@ abstract class Hydrator
 
 							} elseif ($typeRc->implementsInterface(ArrayAccess::class)) {
 								$fields[] = new Hydrators\Fields\ArrayField(
+									$isNullable,
+									$mappedKey,
+									$fieldName,
+									$isRequired,
+									$isWritable,
+								);
+
+							} elseif ($typeRc->isEnum()) {
+								$fields[] = new Hydrators\Fields\EnumField(
+									$className,
 									$isNullable,
 									$mappedKey,
 									$fieldName,
