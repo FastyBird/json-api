@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 /**
- * EnumField.php
+ * BackedEnumField.php
  *
  * @license        More in LICENSE.md
  * @copyright      https://www.fastybird.com
@@ -10,28 +10,26 @@
  * @subpackage     Hydrators
  * @since          0.1.0
  *
- * @date           08.02.24
+ * @date           26.05.20
  */
 
 namespace FastyBird\JsonApi\Hydrators\Fields;
 
 use IPub\JsonAPIDocument;
-use ReflectionClass;
+use function call_user_func;
+use function is_callable;
 
 /**
- * Entity consistence enum field
+ * Entity backed enum field
  *
  * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  *
  * @author         Adam Kadlec <adam.kadlec@fastybird.com>
  */
-final class EnumField extends Field
+final class BackedEnumField extends Field
 {
 
-	/**
-	 * @param class-string $typeClass
-	 */
 	public function __construct(
 		private readonly string $typeClass,
 		private readonly bool $isNullable,
@@ -47,16 +45,16 @@ final class EnumField extends Field
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 */
-	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): object|null
+	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): \BackedEnum|null
 	{
 		$value = $attributes->get($this->getMappedName());
 
-		$rc = new ReflectionClass($this->typeClass);
+		$callable = [$this->typeClass, 'from'];
 
-		if ($rc->isEnum()) {
-			$result = $value !== null ? $this->typeClass::from($value) : null;
+		if (is_callable($callable)) {
+			$result = $value !== null ? call_user_func($callable, $value) : null;
 
-			return $result instanceof $this->typeClass ? $result : null;
+			return $result instanceof \BackedEnum ? $result : null;
 		}
 
 		return null;

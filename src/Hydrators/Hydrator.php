@@ -16,7 +16,6 @@
 namespace FastyBird\JsonApi\Hydrators;
 
 use ArrayAccess;
-use Consistence;
 use DateTimeInterface;
 use Doctrine\Common;
 use Doctrine\ORM;
@@ -540,8 +539,8 @@ abstract class Hydrator
 									$isWritable,
 								);
 
-							} elseif ($typeRc->isSubclassOf(Consistence\Enum\Enum::class)) {
-								$fields[] = new Hydrators\Fields\ConsistenceEnumField(
+							} elseif ($typeRc->isSubclassOf(\BackedEnum::class)) {
+								$fields[] = new Hydrators\Fields\BackedEnumField(
 									$className,
 									$isNullable,
 									$mappedKey,
@@ -552,16 +551,6 @@ abstract class Hydrator
 
 							} elseif ($typeRc->implementsInterface(ArrayAccess::class)) {
 								$fields[] = new Hydrators\Fields\ArrayField(
-									$isNullable,
-									$mappedKey,
-									$fieldName,
-									$isRequired,
-									$isWritable,
-								);
-
-							} elseif ($typeRc->isEnum()) {
-								$fields[] = new Hydrators\Fields\EnumField(
-									$className,
 									$isNullable,
 									$mappedKey,
 									$fieldName,

@@ -40,7 +40,6 @@
   "require" : {
     "php" : ">=8.1.0",
     "ext-json" : "*",
-    "consistence-community/consistence" : "^2.1",
     "cweagans/composer-patches" : "^1.7",
     "doctrine/annotations" : "^1.13",
     "doctrine/orm" : "^2.6",
