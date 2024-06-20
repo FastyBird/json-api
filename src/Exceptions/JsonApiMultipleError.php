@@ -18,6 +18,7 @@ namespace FastyBird\JsonApi\Exceptions;
 use Exception as PHPException;
 use Fig\Http\Message\StatusCodeInterface;
 use Neomerx\JsonApi as NeomerxJsonApi;
+use Stringable;
 
 /**
  * Process multiple error
@@ -46,10 +47,10 @@ class JsonApiMultipleError extends PHPException implements JsonApi
 	 */
 	public function addError(
 		int $code,
-		string $title,
-		string|null $detail = null,
+		string|Stringable $title,
+		string|Stringable|null $detail = null,
 		array|null $source = null,
-		string|null $type = null,
+		string|Stringable|null $type = null,
 	): void
 	{
 		$this->errors[] = new NeomerxJsonApi\Schema\Error(
