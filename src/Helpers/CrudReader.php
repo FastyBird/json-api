@@ -15,9 +15,11 @@
 
 namespace FastyBird\JsonApi\Helpers;
 
-use Doctrine\Common;
 use IPub\DoctrineCrud;
+use ReflectionAttribute;
 use ReflectionProperty;
+use function array_reduce;
+use function assert;
 
 /**
  * Doctrine CRUD annotation reader
@@ -30,42 +32,29 @@ use ReflectionProperty;
 class CrudReader
 {
 
-	private Common\Annotations\Reader $annotationReader;
-
-	/**
-	 * @throws Common\Annotations\AnnotationException
-	 */
-	public function __construct(Common\Cache\Cache|null $cache = null)
-	{
-		$this->annotationReader = $cache !== null ? new Common\Annotations\PsrCachedReader(
-			new Common\Annotations\AnnotationReader(),
-			Common\Cache\Psr6\CacheAdapter::wrap($cache),
-		) : new Common\Annotations\AnnotationReader();
-	}
-
 	/**
 	 * @return array<bool>
 	 */
 	public function read(ReflectionProperty $rp): array
 	{
-		/** @phpstan-ignore-next-line */
-		$crud = $this->annotationReader->getPropertyAnnotation($rp, DoctrineCrud\Mapping\Annotation\Crud::class);
+		$crudAttribute = array_reduce(
+			$rp->getAttributes(),
+			static function (ReflectionAttribute|null $carry, ReflectionAttribute $attribute): ReflectionAttribute|null {
+				if ($carry === null && $attribute->getName() === DoctrineCrud\Mapping\Attribute\Crud::class) {
+					return $attribute;
+				}
 
-		/** @phpstan-ignore-next-line */
-		if (!$crud instanceof DoctrineCrud\Mapping\Annotation\Crud) {
-			/** @phpstan-ignore-next-line */
-			$attributes = $rp->getAttributes(DoctrineCrud\Mapping\Attribute\Crud::class);
-			$crud = $attributes !== [] ? $attributes[0]->newInstance() : null;
+				return $carry;
+			},
+		);
 
-			if ($crud === null) {
-				return [false, false];
-			}
-
-			/** @phpstan-ignore-next-line */
-			return [$crud->isRequired(), $crud->isWritable()];
+		if ($crudAttribute === null) {
+			return [false, false];
 		}
 
-		/** @phpstan-ignore-next-line */
+		$crud = $crudAttribute->newInstance();
+		assert($crud instanceof DoctrineCrud\Mapping\Attribute\Crud);
+
 		return [$crud->isRequired(), $crud->isWritable()];
 	}
 
