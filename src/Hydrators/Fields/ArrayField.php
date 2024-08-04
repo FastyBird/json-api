@@ -42,7 +42,7 @@ final class ArrayField extends Field
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
-	 * @return Array<mixed>|null
+	 * @return array<mixed>|null
 	 */
 	public function getValue(JsonAPIDocument\Objects\IStandardObject $attributes): array|null
 	{

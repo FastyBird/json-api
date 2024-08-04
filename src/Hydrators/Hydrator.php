@@ -34,8 +34,10 @@ use Ramsey\Uuid;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionProperty;
 use Throwable;
+use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
@@ -57,6 +59,7 @@ use function sprintf;
 use function str_contains;
 use function str_replace;
 use function strtolower;
+use function strval;
 use function trim;
 use function ucfirst;
 use function ucwords;
@@ -174,8 +177,8 @@ abstract class Hydrator
 		if (!$document->hasResource()) {
 			throw new Exceptions\JsonApiError(
 				StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.heading'),
-				$this->translator->translate('//jsonApi.hydrator.resourceInvalid.message'),
+				strval($this->translator->translate('//jsonApi.hydrator.resourceInvalid.heading')),
+				strval($this->translator->translate('//jsonApi.hydrator.resourceInvalid.message')),
 				[
 					'pointer' => '/data',
 				],
@@ -220,8 +223,8 @@ abstract class Hydrator
 				if ($identifier === null || !Uuid\Uuid::isValid($identifier)) {
 					throw new Exceptions\JsonApiError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.heading'),
-						$this->translator->translate('//jsonApi.hydrator.identifierInvalid.message'),
+						strval($this->translator->translate('//jsonApi.hydrator.identifierInvalid.heading')),
+						strval($this->translator->translate('//jsonApi.hydrator.identifierInvalid.message')),
 						[
 							'pointer' => '/data/id',
 						],
@@ -277,6 +280,22 @@ abstract class Hydrator
 			$reflectionProperties[] = $rp->getName();
 		}
 
+		$constructorRequiredParameters = array_map(
+			static fn (ReflectionParameter $parameter): string => $parameter->getName(),
+			array_filter(
+				$rc->getConstructor()?->getParameters() ?? [],
+				static fn (ReflectionParameter $parameter): bool => !$parameter->isOptional(),
+			),
+		);
+
+		$constructorOptionalParameters = array_map(
+			static fn (ReflectionParameter $parameter): string => $parameter->getName(),
+			array_filter(
+				$rc->getConstructor()?->getParameters() ?? [],
+				static fn (ReflectionParameter $parameter): bool => $parameter->isOptional(),
+			),
+		);
+
 		$entityFields = array_unique(array_merge(
 			$reflectionProperties,
 			$classMetadata->getFieldNames(),
@@ -294,12 +313,22 @@ abstract class Hydrator
 				continue;
 			}
 
-			if ($this->crudReader !== null) {
-				[$isRequired, $isWritable] = $this->crudReader->read($rp) + [false, false];
-
+			if (
+				in_array($fieldName, $constructorRequiredParameters, true)
+				|| in_array($fieldName, $constructorOptionalParameters, true)
+			) {
+				[$isRequired, $isWritable] = [
+					in_array($fieldName, $constructorRequiredParameters, true),
+					in_array($fieldName, $constructorOptionalParameters, true),
+				];
 			} else {
-				$isRequired = false;
-				$isWritable = true;
+				if ($this->crudReader !== null) {
+					[$isRequired, $isWritable] = $this->crudReader->read($rp) + [false, false];
+
+				} else {
+					$isRequired = false;
+					$isWritable = true;
+				}
 			}
 
 			// Check if field is updatable
@@ -785,8 +814,8 @@ abstract class Hydrator
 			if ($value === null && $field->isRequired() && $isNew) {
 				$this->errors->addError(
 					StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.heading'),
-					$this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.message'),
+					strval($this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.heading')),
+					strval($this->translator->translate('//jsonApi.hydrator.missingRequiredAttribute.message')),
 					[
 						'pointer' => '/data/attributes/' . $field->getMappedName(),
 					],
@@ -1038,8 +1067,8 @@ abstract class Hydrator
 				} elseif ($field->isRequired() && $entity === null) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
-						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
+						strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading')),
+						strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message')),
 						[
 							'pointer' => '/data/relationships/' . $field->getMappedName() . '/data/id',
 						],
@@ -1129,8 +1158,8 @@ abstract class Hydrator
 					} elseif ($entity === null && $field->isRequired()) {
 						$this->errors->addError(
 							StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
-							$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
+							strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading')),
+							strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message')),
 							[
 								'pointer' => '/data/relationships/' . $field->getMappedName() . '/data/id',
 							],
@@ -1139,8 +1168,8 @@ abstract class Hydrator
 				} elseif ($entity === null && $field->isRequired()) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
-						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
+						strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading')),
+						strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message')),
 						[
 							'pointer' => '/data/relationships/' . $field->getMappedName() . '/data/id',
 						],
@@ -1215,8 +1244,8 @@ abstract class Hydrator
 				if ($entity === null && $field->isRequired() && count($relations) === 0) {
 					$this->errors->addError(
 						StatusCodeInterface::STATUS_UNPROCESSABLE_ENTITY,
-						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading'),
-						$this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message'),
+						strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.heading')),
+						strval($this->translator->translate('//jsonApi.hydrator.missingRequiredRelation.message')),
 						[
 							'pointer' => '/data/relationships/' . $field->getMappedName() . '/data',
 						],

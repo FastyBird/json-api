@@ -25,17 +25,20 @@ use SplObjectStorage;
 /**
  * API hydrators container
  *
+ * @template T of object
+ *
  * @package        FastyBird:JsonApi!
  * @subpackage     Hydrators
  */
 class Container
 {
 
-	/** @var SplObjectStorage<Hydrator, null> */
+	/** @var SplObjectStorage<Hydrator<T>, null> */
 	private SplObjectStorage $hydrators;
 
 	private Log\LoggerInterface $logger;
 
+	/** @var JsonApi\SchemaContainer<T>|null */
 	private JsonApi\SchemaContainer|null $jsonApiSchemaContainer = null;
 
 	public function __construct(
@@ -49,6 +52,8 @@ class Container
 	}
 
 	/**
+	 * @return Hydrator<T>|null
+	 *
 	 * @throws DI\MissingServiceException
 	 * @throws Exceptions\InvalidState
 	 */
@@ -79,6 +84,9 @@ class Container
 		return null;
 	}
 
+	/**
+	 * @param Hydrator<T> $hydrator
+	 */
 	public function add(Hydrator $hydrator): void
 	{
 		if (!$this->hydrators->contains($hydrator)) {
@@ -87,6 +95,8 @@ class Container
 	}
 
 	/**
+	 * @return JsonApi\SchemaContainer<T>
+	 *
 	 * @throws DI\MissingServiceException
 	 */
 	private function getSchemaContainer(): JsonApi\SchemaContainer

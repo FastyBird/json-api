@@ -34,7 +34,7 @@ final class SingleEntityField extends EntityField
 	/**
 	 * @param JsonAPIDocument\Objects\IStandardObject<string, mixed> $attributes
 	 *
-	 * @return Array<mixed>|null
+	 * @return array<mixed>|null
 	 *
 	 * @throws Exceptions\InvalidState
 	 */

@@ -25,6 +25,8 @@ use function substr;
 /**
  * Json:API schemas container
  *
+ * @template     T of object
+ *
  * @package        FastyBird:JsonApi!
  * @subpackage     JsonApi
  *
@@ -43,9 +45,7 @@ class SchemaContainer extends JsonApi\Schema\SchemaContainer
 	}
 
 	/**
-	 * @template T of Schemas\JsonApi
-	 *
-	 * @param T $schema
+	 * @param Schemas\JsonApi<T> $schema
 	 */
 	public function add(Schemas\JsonApi $schema): void
 	{
@@ -55,6 +55,8 @@ class SchemaContainer extends JsonApi\Schema\SchemaContainer
 	}
 
 	/**
+	 * @return Schemas\JsonApi<T>
+	 *
 	 * @throws Exceptions\InvalidState
 	 */
 	public function getSchemaByClassName(string $resourceType): Schemas\JsonApi

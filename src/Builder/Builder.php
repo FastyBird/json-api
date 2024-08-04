@@ -21,7 +21,6 @@ use Neomerx;
 use Neomerx\JsonApi\Contracts;
 use Neomerx\JsonApi\Schema;
 use Nette\DI;
-use Nette\Utils;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -33,6 +32,7 @@ use function explode;
 use function http_build_query;
 use function is_array;
 use function round;
+use function str_contains;
 use function str_replace;
 use function str_starts_with;
 use function strval;
@@ -62,7 +62,7 @@ class Builder
 	private const LINK_PREV = Contracts\Schema\DocumentInterface::KEYWORD_PREV;
 
 	/**
-	 * @param string|Array<string> $metaAuthor
+	 * @param string|array<string> $metaAuthor
 	 */
 	public function __construct(
 		private readonly DI\Container $container,
@@ -73,7 +73,7 @@ class Builder
 	}
 
 	/**
-	 * @param object|Array<object>|null $entity
+	 * @param object|array<object>|null $entity
 	 * @param callable(string): bool $linkValidator
 	 *
 	 * @throws InvalidArgumentException
@@ -153,7 +153,7 @@ class Builder
 
 		$encoder->withLinks($links);
 
-		if (Utils\Strings::contains($request->getUri()->getPath(), '/relationships/')) {
+		if (str_contains($request->getUri()->getPath(), '/relationships/')) {
 			$encodedData = $encoder->encodeDataAsArray($entity);
 
 			// Try to get "self" link from encoded entity as array
@@ -244,7 +244,7 @@ class Builder
 	}
 
 	/**
-	 * @return Array<mixed>
+	 * @return array<mixed>
 	 */
 	private function getBaseMeta(): array
 	{
