@@ -31,7 +31,7 @@ class Encoder extends NeomerxEncoder\Encoder
 	/**
 	 * @param object|iterable<mixed>|null $data
 	 *
-	 * @return Array<mixed>
+	 * @return array<mixed>
 	 */
 	public function encodeDataAsArray(object|iterable|null $data): array
 	{

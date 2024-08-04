@@ -44,7 +44,7 @@ class CrudReader
 	}
 
 	/**
-	 * @return Array<bool>
+	 * @return array<bool>
 	 */
 	public function read(ReflectionProperty $rp): array
 	{

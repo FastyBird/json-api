@@ -17,7 +17,7 @@ namespace FastyBird\JsonApi\Exceptions;
 
 use Exception as PHPException;
 use Neomerx\JsonApi as NeomerxJsonApi;
-use Stringable;
+use function strval;
 
 /**
  * Process single error
@@ -31,14 +31,14 @@ class JsonApiError extends PHPException implements Exception, JsonApi
 {
 
 	/**
-	 * @param Array<mixed>|null $source
+	 * @param array<mixed>|null $source
 	 */
 	public function __construct(
 		int $code,
-		string|Stringable $title,
-		private readonly string|Stringable|null $detail = null,
+		string $title,
+		private readonly string|null $detail = null,
 		private readonly array|null $source = null,
-		private readonly string|Stringable|null $type = null,
+		private readonly string|null $type = null,
 	)
 	{
 		parent::__construct($title, $code);
@@ -47,13 +47,13 @@ class JsonApiError extends PHPException implements Exception, JsonApi
 	public function getError(): NeomerxJsonApi\Schema\Error
 	{
 		return new NeomerxJsonApi\Schema\Error(
-			$this->getType(),
+			strval($this->getType()),
 			null,
 			null,
 			(string) $this->code,
 			(string) $this->code,
 			$this->message,
-			$this->getDetail(),
+			strval($this->getDetail()),
 			$this->getSource(),
 		);
 	}
@@ -69,7 +69,7 @@ class JsonApiError extends PHPException implements Exception, JsonApi
 	}
 
 	/**
-	 * @return Array<mixed>|null
+	 * @return array<mixed>|null
 	 */
 	public function getSource(): array|null
 	{
