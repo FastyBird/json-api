@@ -18,7 +18,6 @@ namespace FastyBird\JsonApi\Hydrators;
 use ArrayAccess;
 use BackedEnum;
 use DateTimeInterface;
-use Doctrine\Common;
 use Doctrine\ORM;
 use Doctrine\Persistence;
 use FastyBird\JsonApi\Exceptions;
@@ -31,6 +30,7 @@ use Nette\Localization;
 use Nette\Utils;
 use phpDocumentor;
 use Ramsey\Uuid;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
@@ -41,7 +41,9 @@ use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
+use function array_reduce;
 use function array_unique;
+use function assert;
 use function call_user_func;
 use function class_exists;
 use function count;
@@ -139,25 +141,14 @@ abstract class Hydrator
 	/** @var array<string, string>|null */
 	private array|null $normalizedRelationships = null;
 
-	private Common\Annotations\Reader $annotationReader;
-
 	private Exceptions\JsonApiMultipleError $errors;
 
-	/**
-	 * @throws Common\Annotations\AnnotationException
-	 */
 	public function __construct(
-		private readonly Persistence\ManagerRegistry $managerRegistry,
-		protected Localization\Translator $translator,
-		private readonly Helpers\CrudReader|null $crudReader = null,
-		Common\Cache\Cache|null $cache = null,
+		protected readonly Persistence\ManagerRegistry $managerRegistry,
+		protected readonly Localization\Translator $translator,
+		protected readonly Helpers\CrudReader|null $crudReader = null,
 	)
 	{
-		$this->annotationReader = $cache !== null ? new Common\Annotations\PsrCachedReader(
-			new Common\Annotations\AnnotationReader(),
-			Common\Cache\Psr6\CacheAdapter::wrap($cache),
-		) : new Common\Annotations\AnnotationReader();
-
 		$this->errors = new Exceptions\JsonApiMultipleError();
 	}
 
@@ -355,25 +346,28 @@ abstract class Hydrator
 			}
 
 			// Extract all entity property annotations
-			$propertyAnnotations = array_merge(
-				array_map(
-					(static fn ($annotation): string => $annotation::class),
-					$this->annotationReader->getPropertyAnnotations($rp),
-				),
-				array_map(
-					(static fn ($attribute): string => $attribute->getName()),
-					$rp->getAttributes(),
-				),
+			$propertyAttributes = array_map(
+				(static fn ($attribute): string => $attribute->getName()),
+				$rp->getAttributes(),
 			);
 
-			if (in_array(ORM\Mapping\OneToOne::class, $propertyAnnotations, true)) {
-				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToOne::class);
-				$className = $mapping?->targetEntity;
+			if (in_array(ORM\Mapping\OneToOne::class, $propertyAttributes, true)) {
+				$propertyAttribute = array_reduce(
+					$rp->getAttributes(),
+					static function (ReflectionAttribute|null $carry, ReflectionAttribute $attribute): ReflectionAttribute|null {
+						if ($carry === null && $attribute->getName() === ORM\Mapping\OneToOne::class) {
+							return $attribute;
+						}
 
-				if ($className === null) {
-					$attributes = $rp->getAttributes(ORM\Mapping\OneToOne::class);
-					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
-				}
+						return $carry;
+					},
+				);
+				assert($propertyAttribute instanceof ReflectionAttribute);
+
+				$propertyAttribute = $propertyAttribute->newInstance();
+				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+
+				$className = $propertyAttribute->targetEntity;
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
@@ -387,14 +381,23 @@ abstract class Hydrator
 						$isWritable,
 					);
 				}
-			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAnnotations, true)) {
-				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\OneToMany::class);
-				$className = $mapping?->targetEntity;
+			} elseif (in_array(ORM\Mapping\OneToMany::class, $propertyAttributes, true)) {
+				$propertyAttribute = array_reduce(
+					$rp->getAttributes(),
+					static function (ReflectionAttribute|null $carry, ReflectionAttribute $attribute): ReflectionAttribute|null {
+						if ($carry === null && $attribute->getName() === ORM\Mapping\OneToMany::class) {
+							return $attribute;
+						}
 
-				if ($className === null) {
-					$attributes = $rp->getAttributes(ORM\Mapping\OneToMany::class);
-					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
-				}
+						return $carry;
+					},
+				);
+				assert($propertyAttribute instanceof ReflectionAttribute);
+
+				$propertyAttribute = $propertyAttribute->newInstance();
+				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+
+				$className = $propertyAttribute->targetEntity;
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
@@ -408,14 +411,23 @@ abstract class Hydrator
 						$isWritable,
 					);
 				}
-			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAnnotations, true)) {
-				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToMany::class);
-				$className = $mapping?->targetEntity;
+			} elseif (in_array(ORM\Mapping\ManyToMany::class, $propertyAttributes, true)) {
+				$propertyAttribute = array_reduce(
+					$rp->getAttributes(),
+					static function (ReflectionAttribute|null $carry, ReflectionAttribute $attribute): ReflectionAttribute|null {
+						if ($carry === null && $attribute->getName() === ORM\Mapping\ManyToMany::class) {
+							return $attribute;
+						}
 
-				if ($className === null) {
-					$attributes = $rp->getAttributes(ORM\Mapping\ManyToMany::class);
-					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
-				}
+						return $carry;
+					},
+				);
+				assert($propertyAttribute instanceof ReflectionAttribute);
+
+				$propertyAttribute = $propertyAttribute->newInstance();
+				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+
+				$className = $propertyAttribute->targetEntity;
 
 				// Check if class is callable
 				if ($className !== null && class_exists($className)) {
@@ -429,14 +441,23 @@ abstract class Hydrator
 						$isWritable,
 					);
 				}
-			} elseif (in_array(ORM\Mapping\ManyToOne::class, $propertyAnnotations, true)) {
-				$mapping = $this->annotationReader->getPropertyAnnotation($rp, ORM\Mapping\ManyToOne::class);
-				$className = $mapping?->targetEntity;
+			} elseif (in_array(ORM\Mapping\ManyToOne::class, $propertyAttributes, true)) {
+				$propertyAttribute = array_reduce(
+					$rp->getAttributes(),
+					static function (ReflectionAttribute|null $carry, ReflectionAttribute $attribute): ReflectionAttribute|null {
+						if ($carry === null && $attribute->getName() === ORM\Mapping\ManyToOne::class) {
+							return $attribute;
+						}
 
-				if ($className === null) {
-					$attributes = $rp->getAttributes(ORM\Mapping\ManyToOne::class);
-					$className = $attributes !== [] ? $attributes[0]->newInstance()->targetEntity : null;
-				}
+						return $carry;
+					},
+				);
+				assert($propertyAttribute instanceof ReflectionAttribute);
+
+				$propertyAttribute = $propertyAttribute->newInstance();
+				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+
+				$className = $propertyAttribute->targetEntity;
 
 				// Check if class is callable
 				if (is_string($className) && class_exists($className)) {
