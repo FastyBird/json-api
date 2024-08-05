@@ -395,7 +395,7 @@ abstract class Hydrator
 				assert($propertyAttribute instanceof ReflectionAttribute);
 
 				$propertyAttribute = $propertyAttribute->newInstance();
-				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+				assert($propertyAttribute instanceof ORM\Mapping\OneToMany);
 
 				$className = $propertyAttribute->targetEntity;
 
@@ -425,7 +425,7 @@ abstract class Hydrator
 				assert($propertyAttribute instanceof ReflectionAttribute);
 
 				$propertyAttribute = $propertyAttribute->newInstance();
-				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+				assert($propertyAttribute instanceof ORM\Mapping\ManyToMany);
 
 				$className = $propertyAttribute->targetEntity;
 
@@ -455,7 +455,7 @@ abstract class Hydrator
 				assert($propertyAttribute instanceof ReflectionAttribute);
 
 				$propertyAttribute = $propertyAttribute->newInstance();
-				assert($propertyAttribute instanceof ORM\Mapping\OneToOne);
+				assert($propertyAttribute instanceof ORM\Mapping\ManyToOne);
 
 				$className = $propertyAttribute->targetEntity;
 
