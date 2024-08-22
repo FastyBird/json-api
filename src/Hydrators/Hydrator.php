@@ -161,6 +161,7 @@ abstract class Hydrator
 	public function hydrate(
 		JsonAPIDocument\IDocument $document,
 		object|null $entity = null,
+		bool $includeRelationShips = true,
 	): Utils\ArrayHash
 	{
 		$entityMapping = $this->mapEntity($this->getEntityName());
@@ -186,12 +187,16 @@ abstract class Hydrator
 			null,
 		);
 
-		$relationships = $this->hydrateRelationships(
-			$resource->getRelationships(),
-			$entityMapping,
-			$document->hasIncluded() ? $document->getIncluded() : null,
-			$entity,
-		);
+		$relationships = [];
+
+		if ($includeRelationShips) {
+			$relationships = $this->hydrateRelationships(
+				$resource->getRelationships(),
+				$entityMapping,
+				$document->hasIncluded() ? $document->getIncluded() : null,
+				$entity,
+			);
+		}
 
 		if ($this->errors->hasErrors()) {
 			throw $this->errors;
